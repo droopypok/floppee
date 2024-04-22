@@ -58,8 +58,7 @@ def register():
 
     if user_exists:
         return jsonify({"message": "Unable to create account"}, 400)
-      
-
+    
     
     hashed_password = bcrypt.generate_password_hash(password, 10).decode('utf-8')
     new_user = Users(username=username, password=hashed_password)
@@ -71,3 +70,11 @@ def register():
         "username": new_user.username,
     })
 
+
+@users_bp.route("/roles/", methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_roles():
+    roles = User_Roles.query.all()
+    json_roles = list(map(lambda x: x.to_json(), roles))
+
+    return jsonify({"roles": json_roles})
