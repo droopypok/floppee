@@ -3,11 +3,11 @@ from ..extensions import db
 from ..Models.usersModels import Users
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_cors import cross_origin
 
 bcrypt = Bcrypt()
 
 users_bp = Blueprint("users", __name__)
-
 
 @users_bp.route("/users", methods=["GET"])
 def get_users():
@@ -17,8 +17,10 @@ def get_users():
     
     return jsonify({"users": json_users})
 
-@users_bp.route("/login", methods=["POST"])
+@users_bp.route("/login", methods=['POST', 'OPTIONS'])
+@cross_origin()
 def login():
+
     username = request.json["username"]
     password = request.json["password"]
 
@@ -35,6 +37,8 @@ def login():
                     "role": user.role,
                     "access": access,
                     "refresh": refresh,})
+
+   
 
 
 @users_bp.route("/register", methods=["POST"])

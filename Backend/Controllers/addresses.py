@@ -1,8 +1,8 @@
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 
 from flask import jsonify, Blueprint
-from Backend.Models.usersModels import Addresses
+from ..Models.usersModels import Addresses
 
 address_bp = Blueprint("addresses", __name__)
 
@@ -11,5 +11,7 @@ def get_addresses():
     addresses = Addresses.query.all()
     json_addresses = list(map(lambda x: x.to_json(), addresses))
     return jsonify({"addresses": json_addresses})
+
+
 
 
