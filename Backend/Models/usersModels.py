@@ -1,7 +1,7 @@
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 
-from Backend.config import db
+from ..extensions import db
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
