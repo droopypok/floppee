@@ -68,14 +68,11 @@ const Register = () => {
             value={role} // Set the selected value to the state 'role'
             onChange={(e) => setRole(e.target.value)}
           >
-            {availableRoles.map(
-              (option) =>
-                option.role !== "admin" && (
-                  <option key={option.role} value={option.role}>
-                    {option.role}
-                  </option>
-                )
-            )}
+            {availableRoles.map((option) => (
+              <option key={option.role} value={option.role}>
+                {option.role}
+              </option>
+            ))}
           </select>
         )}
         <button>Register</button>
