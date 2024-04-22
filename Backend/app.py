@@ -1,10 +1,11 @@
 import os
 from flask import Flask, request, jsonify, make_response
-from .extensions import db, jwt, cors
+from .extensions import db, jwt, migrate
 from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
+from sqlalchemy import inspect
 
 load_dotenv()
 
@@ -27,5 +28,7 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
+
 
     return app

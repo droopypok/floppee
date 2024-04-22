@@ -1,15 +1,16 @@
 from flask import jsonify, request, Blueprint
 from ..extensions import db
-from ..Models.usersModels import Users
+from ..Models.usersModels import Users, User_Roles
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_cors import cross_origin
+
 
 bcrypt = Bcrypt()
 
 users_bp = Blueprint("users", __name__)
 
-@users_bp.route("/users", methods=["GET"])
+@users_bp.route("/users/", methods=["GET"])
 def get_users():
     print("here")
     users = Users.query.all()
@@ -17,7 +18,8 @@ def get_users():
     
     return jsonify({"users": json_users})
 
-@users_bp.route("/login", methods=['POST', 'OPTIONS'])
+
+@users_bp.route("/login/", methods=['POST', 'OPTIONS'])
 @cross_origin()
 def login():
 
@@ -28,9 +30,13 @@ def login():
     
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Username or password not found!"}, 400)
+    
+    role = User_Roles.query.filter_by(id=user.role).first()
 
-    access = create_access_token(identity=user.username, additional_claims=user.role)
-    refresh = create_refresh_token(identity=user.username, additional_claims=user.role)
+    # access = create_access_token(identity=user.username, additional_claims={'role': role})
+    # refresh = create_refresh_token(identity=user.username, additional_claims={'role': role})
+    access = create_access_token(identity=user.username, additional_claims={"role": role.role})
+    refresh = create_refresh_token(identity=user.username, additional_claims={"role": role.role})
 
     return jsonify({"id": user.id,
                     "username": user.username,
@@ -41,7 +47,8 @@ def login():
    
 
 
-@users_bp.route("/register", methods=["POST"])
+@users_bp.route("/register/", methods=["POST", "OPTIONS"])
+@cross_origin()
 def register():
     username = request.json["username"]
     password = request.json["password"]

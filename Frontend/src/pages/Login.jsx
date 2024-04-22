@@ -9,7 +9,7 @@ const Login = () => {
 
   const login = async () => {
     const res = await fetchData(
-      "/login",
+      "/login/",
       "POST",
       { username, password },
       undefined
@@ -18,6 +18,9 @@ const Login = () => {
       console.log("logged in");
       console.log(res.data.access);
       console.log(res.data.refresh);
+      const decoded = jwtDecode(res.data.access);
+      console.log(decoded.role);
+      console.log(decoded.username);
     }
     console.log(username);
     console.log(password);

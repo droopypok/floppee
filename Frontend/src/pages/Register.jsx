@@ -9,15 +9,13 @@ const Register = () => {
 
   const register = async () => {
     const res = await fetchData(
-      "/register",
+      "/register/",
       "POST",
       { username, password, role },
       undefined
     );
     if (res.ok) {
-      console.log("logged in");
-      console.log(res.data.access);
-      console.log(res.data.refresh);
+      res.data;
     }
     console.log(username);
     console.log(password);
@@ -42,17 +40,20 @@ const Register = () => {
           placeholder="username"
           type="text"
           onChange={(e) => setUsername(e.target.value)}
+          value={username}
         ></input>
         <input
           placeholder="password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
+          value={password}
         ></input>
-        <input
+        {/* <input
           placeholder="role"
           type="text"
           onChange={(e) => setRole(e.target.value)}
-        ></input>
+          value={role}
+        ></input> */}
         <button>Register</button>
       </form>
     </>
