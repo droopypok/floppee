@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 
 const Register = () => {
   const fetchData = useFetch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [availableRoles, setAvailableRoles] = useState([]);
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const register = async () => {
     const res = await fetchData(
@@ -25,35 +27,57 @@ const Register = () => {
     setRole("");
   };
 
+  const getRoles = async () => {
+    const res = await fetchData("/roles/", "GET", undefined, undefined);
+    if (res.ok) {
+      console.log(res.data);
+      setAvailableRoles(res.data.roles);
+      setLoading(false); // Update loading state once data is fetched
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     register();
   };
+
+  useEffect(() => {
+    getRoles();
+  }, []);
+
   return (
     <>
-      <form
-        onSubmit={(e) => {
-          handleSubmit(e);
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <input
           placeholder="username"
           type="text"
           onChange={(e) => setUsername(e.target.value)}
           value={username}
-        ></input>
+        />
         <input
           placeholder="password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
-        ></input>
-        {/* <input
-          placeholder="role"
-          type="text"
-          onChange={(e) => setRole(e.target.value)}
-          value={role}
-        ></input> */}
+        />
+
+        {loading ? (
+          <p>Loading....</p>
+        ) : (
+          <select
+            value={role} // Set the selected value to the state 'role'
+            onChange={(e) => setRole(e.target.value)}
+          >
+            {availableRoles.map(
+              (option) =>
+                option.role !== "admin" && (
+                  <option key={option.role} value={option.role}>
+                    {option.role}
+                  </option>
+                )
+            )}
+          </select>
+        )}
         <button>Register</button>
       </form>
     </>
