@@ -92,3 +92,29 @@ def delete_product(id):
     db.session.commit()
 
     return jsonify({"message": "Product deleted successfully"}), 200
+
+
+
+## Categories
+@products_bp.route('/categories/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_all_categories():
+    categories = Categories.query.all()
+    json_categories = list(map(lambda category: category.to_json(), categories))
+    return jsonify({"categories": json_categories})
+
+
+## Get ALL products from Categories
+
+@products_bp.route('/categories/<int:id>/', methods=["POST", "OPTIONS"])
+@cross_origin()
+def get_products_by_category(id):
+    category = Categories.query.get(id)
+
+    if category is None:
+        return jsonify({"error": "Category not found"}), 404
+
+    products = Products.query.filter_by(category=id).all()
+    json_products = list(map(lambda product: product.to_json(), products))
+
+    return jsonify({"products": json_products})

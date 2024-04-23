@@ -71,6 +71,15 @@ class Products(db.Model):
     product_name = db.Column(db.String(80), nullable=False)
     category = db.Column(db.Integer, ForeignKey('categories.id'))
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "productName": self.product_name,
+            "description": self.description,
+            "category": self.category
+        }
+
+
 
 class Product_Item(db.Model):
     __tablename__ = 'product_item'
@@ -87,6 +96,12 @@ class Categories(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     category_name = db.Column(db.String(50), unique=True, nullable=False)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "category": self.category_name
+        }
 
 
 
