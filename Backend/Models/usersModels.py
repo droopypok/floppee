@@ -121,6 +121,13 @@ class Product_Types(db.Model):
     category = db.Column(db.Integer, ForeignKey('categories.id'))
     option = db.Column(db.String(50), unique=True)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "category": self.category,
+            "option": self.option,
+        }
+
 
 class Product_Type_Selections(db.Model):
     __tablename__ = 'product_type_selections'
@@ -128,6 +135,13 @@ class Product_Type_Selections(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_type_id = db.Column(db.Integer, ForeignKey('product_types.id'))
     option = db.Column(db.String(50), unique=True)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "option": self.option,
+            "productTypeId": self.product_type_id,
+        }
 
 
 

@@ -32,7 +32,6 @@ def get_product(id):
 def create_product():
     data = request.json
 
-    # Check if all required fields are present
     required_fields = ['description', 'name', 'category']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
@@ -57,13 +56,11 @@ def create_product():
 def update_product(id):
     data = request.json
 
-    # Retrieve the product from the database
     product = Products.query.get(id)
 
     if product is None:
         return jsonify({"error": "Product not found"}), 404
 
-    # Update the product fields if they are present in the request
     if 'description' in data:
         product.description = data['description']
     if 'name' in data:
@@ -180,13 +177,11 @@ def create_product_item():
 def update_product_item(id):
     data = request.json
 
-    # Retrieve the product item from the database
     product_item = Product_Item.query.get(id)
 
     if product_item is None:
         return jsonify({"error": "Product item not found"}), 404
 
-    # Update the product item fields if they are present in the request
     if 'quantity' in data:
         product_item.quantity = data['quantity']
     if 'product_image' in data:
@@ -197,6 +192,7 @@ def update_product_item(id):
     db.session.commit()
 
     return jsonify({"message": "Product item updated successfully"}), 200
+
 
 
 @products_bp.route('/product_items/<int:id>/', methods=["DELETE", "OPTIONS"])
@@ -211,4 +207,35 @@ def delete_product_item(id):
     db.session.commit()
 
     return jsonify({"message": "Product item deleted successfully"}), 200
+
+
+
+# Product Options By Category
+
+@products_bp.route('/product_types/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_product_types_by_category_id(id):
+    product_types = Product_Types.query.filter_by(category=id).all()
+
+    if not product_types:
+        return jsonify({"error": "No product types were found"}), 404
+
+    json_product_types = list(map(lambda product_type: product_type.to_json(), product_types))
+    return jsonify({"product_types": json_product_types})
+
+
+
+# Product Type Selections by Product_Type_id
+
+@products_bp.route('/product_type_selections/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_product_type_selections_by_product_type_id(id):
+    product_type_selections = Product_Type_Selections.query.filter_by(product_type_id=id).all()
+
+    if not product_type_selections:
+        return jsonify({"error": "No product type selections were found"}), 404
+
+    json_product_type_selections = list(map(lambda product_type_selection: product_type_selection.to_json(), product_type_selections))
+    return jsonify({"product_type_selections": json_product_type_selections})
+
 
