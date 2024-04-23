@@ -54,17 +54,16 @@ def register():
     password = request.json["password"]
     role = request.json["role"]
 
-     
-
     user_exists = Users.query.filter_by(username=username).first() is not None
+
+    roleid = User_Roles.query.filter_by(role=role).first()
 
     if user_exists:
         return jsonify({"message": "Unable to create account"}, 400)
     
-    roleid = User_Roles.query.filter_by(role=role).first()
-
     hashed_password = bcrypt.generate_password_hash(password, 10).decode('utf-8')
     new_user = Users(username=username, password=hashed_password, role=roleid.id)
+
     db.session.add(new_user)
     db.session.commit()
 

@@ -6,7 +6,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [availableRoles, setAvailableRoles] = useState([]);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(true);
 
   const register = async () => {
@@ -64,10 +64,7 @@ const Register = () => {
         {loading ? (
           <p>Loading....</p>
         ) : (
-          <select
-            value={role} // Set the selected value to the state 'role'
-            onChange={(e) => setRole(e.target.value)}
-          >
+          <select value={role} onChange={(e) => setRole(e.target.value)}>
             {availableRoles.map((option) => (
               <option key={option.role} value={option.role}>
                 {option.role}
