@@ -90,6 +90,15 @@ class Product_Item(db.Model):
     product_image = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "productID": self.product_id,
+            "quantity": self.quantity,
+            "productImage": self.product_image,
+            "price": self.price
+        }
+
 
 class Categories(db.Model):
     __tablename__ = 'categories'

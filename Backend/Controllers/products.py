@@ -118,3 +118,97 @@ def get_products_by_category(id):
     json_products = list(map(lambda product: product.to_json(), products))
 
     return jsonify({"products": json_products})
+
+
+
+#Get all product item from product id
+
+@products_bp.route('/product_items/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_product_items_by_product_id(id):
+    product_items = Product_Item.query.filter_by(product_id=id).all()
+    
+    if not product_items:
+        return jsonify({"error": "No product items found for the given product ID"}), 404
+
+    json_product_items = list(map(lambda item: item.to_json(), product_items))
+    return jsonify({"product_items": json_product_items})
+
+
+#Get product item by id
+@products_bp.route('/product_items/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_product_item(id):
+    product_item = Product_Item.query.get(id)
+
+    if product_item:
+        return jsonify({"product_item": product_item.to_json()})
+    else:
+        return jsonify({"error": "Product item not found"}), 404
+    
+
+@products_bp.route('/product_items/', methods=["POST", "OPTIONS"])
+@cross_origin()
+def create_product_item():
+    data = request.json
+
+    required_fields = ['product_id', 'quantity', 'productImage', 'price']
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    product_id = data['product_id']
+    quantity = data['quantity']
+    product_image = data['productImage']
+    price = data['price']
+
+    new_product_item = Product_Item(
+        product_id=product_id,
+        quantity=quantity,
+        product_image=product_image,
+        price=price
+    )
+
+    db.session.add(new_product_item)
+    db.session.commit()
+
+    return jsonify({"message": "Product item created successfully"}), 201
+
+
+
+@products_bp.route('/product_items/<int:id>/', methods=["PATCH", "OPTIONS"])
+@cross_origin()
+def update_product_item(id):
+    data = request.json
+
+    # Retrieve the product item from the database
+    product_item = Product_Item.query.get(id)
+
+    if product_item is None:
+        return jsonify({"error": "Product item not found"}), 404
+
+    # Update the product item fields if they are present in the request
+    if 'quantity' in data:
+        product_item.quantity = data['quantity']
+    if 'product_image' in data:
+        product_item.product_image = data['product_image']
+    if 'price' in data:
+        product_item.price = data['price']
+
+    db.session.commit()
+
+    return jsonify({"message": "Product item updated successfully"}), 200
+
+
+@products_bp.route('/product_items/<int:id>/', methods=["DELETE", "OPTIONS"])
+@cross_origin()
+def delete_product_item(id):
+    product_item = Product_Item.query.get(id)
+
+    if product_item is None:
+        return jsonify({"error": "Product item not found"}), 404
+
+    db.session.delete(product_item)
+    db.session.commit()
+
+    return jsonify({"message": "Product item deleted successfully"}), 200
+
