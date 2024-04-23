@@ -8,7 +8,7 @@ from flask_cors import cross_origin
 
 address_bp = Blueprint("addresses", __name__)
 
-@address_bp.route('/addresses', methods=["GET"])
+@address_bp.route('/addresses', methods=["GET", "OPTIONS"])
 @cross_origin()
 def get_all_addresses():
     addresses = Addresses.query.all()
@@ -16,7 +16,7 @@ def get_all_addresses():
     return jsonify({"addresses": json_addresses})
 
 
-@address_bp.route('/addresses/<username>',methods=["POST"])
+@address_bp.route('/addresses/<username>',methods=["POST", "OPTIONS"])
 @cross_origin()
 def get_user_addresses():
     username = request.json["username"]
@@ -33,7 +33,7 @@ def get_user_addresses():
         return jsonify({"error": "NO address found"}), 400
 
 
-@address_bp.route('/create_address', methods=["POST"])
+@address_bp.route('/create_address', methods=["POST", "OPTIONS"])
 @cross_origin()
 def create_address():
     data = request.json
@@ -65,7 +65,7 @@ def create_address():
     return jsonify({"message": "Address created successfully"}), 201
 
 
-@address_bp.route('/update_address/<int:address_id>', methods=["PATCH"])
+@address_bp.route('/update_address/<int:address_id>', methods=["PATCH", "OPTIONS"])
 @cross_origin()
 def update_address(address_id): 
     data = request.json
@@ -91,7 +91,7 @@ def update_address(address_id):
 
 
 
-@address_bp.route('/delete_address/<int:address_id>', methods=["DELETE"])
+@address_bp.route('/delete_address/<int:address_id>', methods=["DELETE", "OPTIONS"])
 @cross_origin()
 def delete_address(address_id): 
     address = Addresses.query.get(address_id)
