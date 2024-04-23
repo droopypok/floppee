@@ -65,13 +65,12 @@ def create_address():
     return jsonify({"message": "Address created successfully"}), 201
 
 
-@address_bp.route('/update_address/<int:address_id>', methods=["PATCH", "OPTIONS"])
+@address_bp.route('/update_address/<int:id>', methods=["PATCH", "OPTIONS"])
 @cross_origin()
-def update_address(address_id): 
+def update_address(id): 
     data = request.json
 
-    # Retrieve the address object from the database
-    address = Addresses.query.get(address_id)
+    address = Addresses.query.get(id)
 
     if address is None:
         return jsonify({"error": "Error updaing address"}), 400
@@ -84,17 +83,16 @@ def update_address(address_id):
     if 'unit_number' in data:
         address.unit_number = data['unit_number']
 
-    # Commit the changes to the database
     db.session.commit()
 
     return jsonify({"message": "Address updated! :) "}), 200
 
 
 
-@address_bp.route('/delete_address/<int:address_id>', methods=["DELETE", "OPTIONS"])
+@address_bp.route('/delete_address/<int:id>', methods=["DELETE", "OPTIONS"])
 @cross_origin()
-def delete_address(address_id): 
-    address = Addresses.query.get(address_id)
+def delete_address(id): 
+    address = Addresses.query.get(id)
 
     if address is None:
         return jsonify({"error": "Address not found"}), 400
