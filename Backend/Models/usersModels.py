@@ -70,13 +70,15 @@ class Products(db.Model):
     product_image = db.Column(db.Text, nullable=True)
     product_name = db.Column(db.String(80), nullable=False)
     category = db.Column(db.Integer, ForeignKey('categories.id'))
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
 
     def to_json(self):
         return {
             "id": self.id,
             "productName": self.product_name,
             "description": self.description,
-            "category": self.category
+            "category": self.category,
+            "userId": self.user_id
         }
 
 
@@ -151,6 +153,15 @@ class Shopping_Cart_Item(db.Model):
     __tablename__ = 'shopping_cart_item'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    quantity = db.Column(db.Integer)
+    bought = db.Column(db.Boolean, default=False)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "productId": self.product_id,
+            "bought": self.bought
+        }
 
 
 class Shopping_Cart(db.Model):
@@ -160,7 +171,13 @@ class Shopping_Cart(db.Model):
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
 
 
+class Bought_Items(db.Model):
+    __tablename__ = 'bought_items'
 
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    status_id = db.Column(db.Integer, ForeignKey('delivery_status.id'))
 
 #order fulfilment
 
@@ -168,15 +185,34 @@ class Orders (db.Model):
     __tablename__ = 'orders'
 
     id = db.Column(db.Integer, primary_key=True)
-    shipping_address = db.Column(db.Integer, ForeignKey('shipping_orders.id'))
-    product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
+    shipping_address = db.Column(db.Integer, ForeignKey('addresses.id'))
+    status = db.Column(db.String(20), nullable=False, default='pending')
 
 
 class Shipping_Orders (db.Model):
     __tablename__ = 'shipping_orders'
 
     id = db.Column(db.Integer, primary_key=True)
-    shipping_address = db.Column(db.Integer, ForeignKey('addresses.id'))
+    order_id = db.Column(db.Integer, ForeignKey('orders.id'))
+    product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    quantity = db.Column(db.Integer, nullable=False)
+
+
+class DeliveryStatus(db.Model):
+    __tablename__ = 'delivery_status'
+
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(20), unique=True, nullable=False)
+
+
+class Shop_Sold_History(db.Model):
+    __tablename__ = 'shop_order_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
+    product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    quantity = db.Column(db.Integer, nullable=False)
 
 
 class Product_Reviews (db.Model):

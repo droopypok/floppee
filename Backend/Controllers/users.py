@@ -26,6 +26,8 @@ def login():
     username = request.json["username"]
     password = request.json["password"]
 
+    print(request.json)
+
     user = Users.query.filter_by(username=username).first()
     
     if user is None or not bcrypt.check_password_hash(user.password, password):
@@ -53,6 +55,8 @@ def register():
     username = request.json["username"]
     password = request.json["password"]
     role = request.json["role"]
+
+    print(request.json)
 
     user_exists = Users.query.filter_by(username=username).first() is not None
 
