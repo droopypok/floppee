@@ -70,7 +70,7 @@ class Products(db.Model):
     product_image = db.Column(db.Text, nullable=True)
     product_name = db.Column(db.String(80), nullable=False)
     category = db.Column(db.Integer, ForeignKey('categories.id'))
-    user_id = db.Column(db.Integer, ForeignKey('users.id'))
+    seller_id = db.Column(db.Integer, ForeignKey('users.id'))
 
     def to_json(self):
         return {
@@ -171,14 +171,6 @@ class Shopping_Cart(db.Model):
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
 
 
-class Bought_Items(db.Model):
-    __tablename__ = 'bought_items'
-
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
-    user_id = db.Column(db.Integer, ForeignKey('users.id'))
-    status_id = db.Column(db.Integer, ForeignKey('delivery_status.id'))
-
 #order fulfilment
 
 class Orders (db.Model):
@@ -186,8 +178,11 @@ class Orders (db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
+    product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+    shopping_cart_id = db.Column(db.Integer, ForeignKey('shopping_cart_id'))
     shipping_address = db.Column(db.Integer, ForeignKey('addresses.id'))
     status = db.Column(db.String(20), nullable=False, default='pending')
+    
 
 
 class Shipping_Orders (db.Model):
@@ -204,15 +199,6 @@ class DeliveryStatus(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(20), unique=True, nullable=False)
-
-
-class Shop_Sold_History(db.Model):
-    __tablename__ = 'shop_order_history'
-
-    id = db.Column(db.Integer, primary_key=True)
-    buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
-    product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
-    quantity = db.Column(db.Integer, nullable=False)
 
 
 class Product_Reviews (db.Model):

@@ -63,7 +63,7 @@ const Register = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}>
         <input
           placeholder="username"
           type="text"
@@ -89,7 +89,7 @@ const Register = () => {
           </select>
         )}
         <button>Register</button>
-      </form>
+      </form> */}
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -152,7 +152,7 @@ const Register = () => {
               </Button>
 
               <Grid>
-                {/* <Grid item sm>
+                <Grid item sm>
                   <InputLabel id="demo-simple-select-label"></InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -167,7 +167,7 @@ const Register = () => {
                         <MenuItem value={option.role}>{option.role}</MenuItem>
                       ))}
                   </Select>
-                </Grid> */}
+                </Grid>
 
                 <Grid container justifyContent="flex-end">
                   <Grid item>
