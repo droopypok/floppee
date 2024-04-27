@@ -11,6 +11,7 @@ function App() {
   const [accessToken, setAccessToken] = useState("");
   const [role, setRole] = useState("");
   const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState(0);
 
   return (
     <>
@@ -20,6 +21,8 @@ function App() {
           setAccessToken,
           username,
           setUsername,
+          userId,
+          setUserId,
           role,
           setRole,
         }}

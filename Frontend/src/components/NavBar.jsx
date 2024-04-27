@@ -13,8 +13,6 @@ const NavBar = () => {
   const userCtx = useContext(UserContext);
   const navigate = useNavigate();
 
-  console.log(userCtx);
-
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>

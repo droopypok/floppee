@@ -34,15 +34,16 @@ const Login = () => {
       undefined
     );
     if (res.ok) {
+      console.log(res);
       userCtx.setUsername(res.data.username);
       userCtx.setAccessToken(res.data.access);
 
       const decoded = jwtDecode(res.data.access);
       userCtx.setRole(decoded.role);
+      userCtx.setUserId(decoded.id);
 
       navigate("/main");
     }
-    console.log(userCtx.username);
   };
 
   const handleSubmit = (e) => {

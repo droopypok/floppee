@@ -37,8 +37,8 @@ def login():
 
     # access = create_access_token(identity=user.username, additional_claims={'role': role})
     # refresh = create_refresh_token(identity=user.username, additional_claims={'role': role})
-    access = create_access_token(identity=user.username, additional_claims={"role": role.role})
-    refresh = create_refresh_token(identity=user.username, additional_claims={"role": role.role})
+    access = create_access_token(identity=user.username, additional_claims={"role": role.role, "id": user.id})
+    refresh = create_refresh_token(identity=user.username, additional_claims={"role": role.role, "id": user.id})
 
     return jsonify({"id": user.id,
                     "username": user.username,
