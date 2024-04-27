@@ -61,33 +61,6 @@ const Register = () => {
 
   return (
     <>
-      {/* <form onSubmit={handleSubmit}>
-        <input
-          placeholder="username"
-          type="text"
-          onChange={(e) => setUsername(e.target.value)}
-          value={username}
-        />
-        <input
-          placeholder="password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-
-        {loading ? (
-          <p>Loading....</p>
-        ) : (
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            {availableRoles.map((option) => (
-              <option key={option.role} value={option.role}>
-                {option.role}
-              </option>
-            ))}
-          </select>
-        )}
-        <button>Register</button>
-      </form> */}
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -140,15 +113,6 @@ const Register = () => {
                   />
                 </Grid>
               </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Sign Up
-              </Button>
-
               <Grid>
                 <Grid item sm>
                   <InputLabel id="demo-simple-select-label"></InputLabel>
@@ -166,6 +130,14 @@ const Register = () => {
                       ))}
                   </Select>
                 </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Sign Up
+                </Button>
 
                 <Grid container justifyContent="flex-end">
                   <Grid item>

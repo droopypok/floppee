@@ -43,7 +43,7 @@ def create_product():
 
     category = Categories.query.filter_by(category_name=category_name).first()
 
-    new_product = Products(description=description, name=name, category=category.id)
+    new_product = Products(description=description, product_name=name, category=category.id)
 
     db.session.add(new_product)
     db.session.commit()
