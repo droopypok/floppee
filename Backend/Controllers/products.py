@@ -18,10 +18,17 @@ def get_all_products():
 @products_bp.route('/products/<int:id>/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def get_product(id):
-    product = Products.query.get(id)
+    print(id)
+    product = Products.query.filter_by(seller_id = id)
 
-    if product:
-        return jsonify({"product": product})
+    print(product)
+
+    json_products = list(map(lambda x: x.to_json(), product))
+
+    print(json_products)
+
+    if json_products:
+        return jsonify({"product": json_products})
     
     else:
         return jsonify({"error": "NO product found"}), 400

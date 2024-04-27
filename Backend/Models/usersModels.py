@@ -78,7 +78,7 @@ class Products(db.Model):
             "productName": self.product_name,
             "description": self.description,
             "category": self.category,
-            "userId": self.user_id
+            "sellerId": self.seller_id
         }
 
 

@@ -8,6 +8,8 @@ import {
   Button,
   Container,
   Card,
+  CardActionArea,
+  CardMedia,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
@@ -18,6 +20,8 @@ const Sellers = () => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCategory, setProductCategory] = useState("laptop");
+
+  const [sellerProducts, setSellerProducts] = useState([]);
 
   const fetchData = useFetch();
   const userCtx = useContext(UserContext);
@@ -50,9 +54,21 @@ const Sellers = () => {
 
   useEffect(() => {
     getAllCategories();
+    getSellerProducts();
   }, []);
 
-  const getSellerProducts = async () => {};
+  const getSellerProducts = async () => {
+    const res = await fetchData(
+      "/products/" + userCtx.userId + "/",
+      "POST",
+      undefined,
+      undefined
+    );
+    if (res.ok) {
+      setSellerProducts(res.data.product);
+    }
+    console.log(sellerProducts);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -62,7 +78,6 @@ const Sellers = () => {
   return (
     <>
       <Container>
-        <Card></Card>
         <Box
           sx={{
             marginTop: 8,
@@ -128,6 +143,24 @@ const Sellers = () => {
             </Grid>
           </Box>
         </Box>
+        <Button onClick={() => getSellerProducts()}>get seller</Button>
+
+        <Grid container spacing={2}>
+          {sellerProducts.length > 0 &&
+            sellerProducts.map((item) => {
+              return (
+                <Grid key={item.id} item sm={3}>
+                  <Card>
+                    <CardActionArea onClick={() => console.log("Clicked")}>
+                      <CardMedia component="img" height="140" />
+                      <h3>{item.productName}</h3>
+                      <h3>{item.description}</h3>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              );
+            })}
+        </Grid>
       </Container>
     </>
   );
