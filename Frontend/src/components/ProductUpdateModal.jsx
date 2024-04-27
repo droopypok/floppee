@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { Grid, TextField, InputLabel, Select } from "@mui/material";
+import { Grid, TextField, InputLabel, Select, MenuItem } from "@mui/material";
+import useFetch from "../hooks/useFetch";
 
 const style = {
   position: "absolute",
@@ -18,65 +19,88 @@ const style = {
 };
 
 export default function ProductUpdateModal(props) {
+  const productNameRef = useRef(props.selectedProduct.name);
+  const productDescriptionRef = useRef(props.selectedProduct.description);
+  const categoryRef = useRef(props.selectedProduct.category);
+
+  const fetchData = useFetch();
+
+  const handleUpdate = async () => {
+    const updatedProduct = {
+      id: props.selectedProduct.id,
+      name: productNameRef.current.value,
+      description: productDescriptionRef.current.value,
+      category: categoryRef.current.value,
+    };
+
+    const res = await fetchData(
+      "/update_product/" + props.selectedProduct.id + "/",
+      "PATCH",
+      updatedProduct,
+      undefined
+    );
+
+    if (res.ok) {
+      console.log("product updated");
+      props.getSellerProducts();
+      props.handleClose(); // Close the modal after successful update
+    }
+  };
+
   return (
     <div>
-      {console.log(props.selectedProduct)}
-      {/* <Modal
+      <Modal
         open={props.open}
         onClose={props.handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box component="form" noValidate sx={{ mt: 3 }}>
+        <Box component="form" noValidate sx={style}>
           <Grid container>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 required
                 label="Product Name"
-                onChange={(e) => setProductName(e.target.value)}
-              ></TextField>
+                defaultValue={props.selectedProduct.name}
+                inputRef={productNameRef}
+              />
               <TextField
+                multiline
                 fullWidth
                 required
                 label="Product Description"
-                onChange={(e) => setProductDescription(e.target.value)}
-              ></TextField>
-
+                defaultValue={props.selectedProduct.description}
+                inputRef={productDescriptionRef}
+              />
               <InputLabel id="Category-select">Category</InputLabel>
               <Select
                 id="Category-select"
                 label="Category"
-                value={props.prod}
-                onChange={(e) => {
-                  setProductCategory(e.target.value);
-                }}
+                defaultValue={props.selectedProduct.category}
+                inputRef={categoryRef}
               >
-                {availableCategories.length > 0 &&
-                  availableCategories.map((item) => {
+                {props.availableCategories.length > 0 &&
+                  props.availableCategories.map((item) => {
                     return (
-                      <MenuItem
-                        id={item.id}
-                        key={item.id}
-                        value={item.category}
-                      >
+                      <MenuItem key={item.id} value={item.category}>
                         {item.category}
                       </MenuItem>
                     );
                   })}
               </Select>
               <Button
-                type="submit"
+                onClick={handleUpdate}
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Create new product
+                Update product
               </Button>
             </Grid>
           </Grid>
         </Box>
-      </Modal> */}
+      </Modal>
     </div>
   );
 }

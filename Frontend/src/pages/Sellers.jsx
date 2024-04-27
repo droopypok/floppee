@@ -30,10 +30,11 @@ const Sellers = () => {
     id: "",
     name: "",
     description: "",
+    category: "",
   });
 
   const [open, setOpen] = useState(false);
-  const handleOpen = (id, productDescription, productName, productCategory) => {
+  const handleOpen = (id, productName, productDescription, productCategory) => {
     setSelectedProducts({
       id: id,
       name: productName,
@@ -110,6 +111,10 @@ const Sellers = () => {
     getAllCategories();
     getSellerProducts();
   }, []);
+
+  useEffect(() => {
+    console.log(sellerProducts);
+  }, [sellerProducts]);
 
   return (
     <>
@@ -237,6 +242,7 @@ const Sellers = () => {
             setProductCategory={setProductCategory}
             setProductDescription={setProductDescription}
             availableCategories={availableCategories}
+            getSellerProducts={getSellerProducts}
           ></ProductUpdateModal>
         </Grid>
       </Container>

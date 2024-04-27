@@ -18,31 +18,6 @@ def get_all_products():
 @products_bp.route('/products/<int:id>/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def get_product(id):
-
-    # product = Products.query.join(Categories, Products.category == Categories.id).filter_by(Products.seller_id = id)
-
-    # products = db.session.query(
-    #     Products.id,
-    #     Products.description,
-    #     Products.product_image,
-    #     Products.product_name,
-    #     Categories.category_name.label("category"),
-    #     Products.seller_id
-    # ).join(
-    #     Categories, Products.category == Categories.id
-    # ).filter(
-    #     Products.seller_id == id
-    # ).all()
-
-    # print(products)
-
-    # json_products = list(map(lambda x: x.to_json(), products))
-
-    # if json_products:
-    #     return jsonify({"product": json_products})
-    
-    # else:
-    #     return jsonify({"error": "NO product found"}), 400
     products = db.session.query(
         Products.id,
         Products.description,
@@ -94,7 +69,7 @@ def create_product():
     return jsonify({"message": "Product created successfully"}), 200
 
 
-@products_bp.route('/update_product/<int:id>/', methods=["PUT", "OPTIONS"])
+@products_bp.route('/update_product/<int:id>/', methods=["PATCH", "OPTIONS"])
 @cross_origin()
 def update_product(id):
     data = request.json
@@ -106,13 +81,16 @@ def update_product(id):
 
     if 'description' in data:
         product.description = data['description']
+        print("Description updated:", data['description'])
+
     if 'name' in data:
-        product.name = data['name']
+        product.product_name = data['name']
+        print("Name updated", data['name'])
+
     if 'category' in data:
         category_name = data['category']
         category = Categories.query.filter_by(category_name=category_name).first()
-        product.category_id = category.id
-
+        product.category = category.id
   
         db.session.commit()
     
