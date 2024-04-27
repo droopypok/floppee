@@ -84,7 +84,7 @@ def update_product(id):
 
 
 
-@products_bp.route('/delete_product/<int:id>', methods=["DELETE", "OPTIONS"])
+@products_bp.route('/delete_product/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
 def delete_product(id): 
     product = Products.query.get(id)

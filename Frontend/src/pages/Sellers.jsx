@@ -11,6 +11,8 @@ import {
   CardActionArea,
   CardMedia,
   InputLabel,
+  CardContent,
+  CardActions,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
@@ -54,11 +56,6 @@ const Sellers = () => {
     console.log(availableCategories);
   };
 
-  useEffect(() => {
-    getAllCategories();
-    getSellerProducts();
-  }, []);
-
   const getSellerProducts = async () => {
     const res = await fetchData(
       "/products/" + userCtx.userId + "/",
@@ -72,10 +69,29 @@ const Sellers = () => {
     console.log(sellerProducts);
   };
 
+  const deleteProduct = async (id) => {
+    const res = await fetchData(
+      "/delete_product/" + id + "/",
+      "DELETE",
+      undefined,
+      undefined
+    );
+    if (res.ok) {
+      console.log("item deleted");
+      getSellerProducts();
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     createNewProduct();
   };
+
+  // useEffect onLoad
+  useEffect(() => {
+    getAllCategories();
+    getSellerProducts();
+  }, []);
 
   return (
     <>
@@ -148,17 +164,32 @@ const Sellers = () => {
           </Box>
         </Box>
 
+        {/* Seller product view */}
         <Grid container spacing={2}>
           {sellerProducts.length > 0 &&
             sellerProducts.map((item) => {
               return (
                 <Grid key={item.id} item sm={3}>
                   <Card>
-                    <CardActionArea onClick={() => console.log("Clicked")}>
-                      <CardMedia component="img" height="140" />
-                      <h3>{item.productName}</h3>
-                      <h3>{item.description}</h3>
-                    </CardActionArea>
+                    <CardContent>
+                      <CardActionArea onClick={() => console.log("Clicked")}>
+                        <CardMedia component="img" height="140" />
+                        <h3>{item.productName}</h3>
+                        <h3>{item.description}</h3>
+                        <h3>{item.id}</h3>
+                      </CardActionArea>
+                    </CardContent>
+                    <CardActions>
+                      <Button size="small">Update</Button>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          deleteProduct(item.id);
+                        }}
+                      >
+                        Delete Product
+                      </Button>
+                    </CardActions>
                   </Card>
                 </Grid>
               );
