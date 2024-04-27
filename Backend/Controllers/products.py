@@ -124,15 +124,17 @@ def get_all_categories():
 
 ## Get ALL products from Categories
 
-@products_bp.route('/categories/<int:id>/', methods=["POST", "OPTIONS"])
+@products_bp.route('/categories/<name>/', methods=["GET", "OPTIONS"])
 @cross_origin()
-def get_products_by_category(id):
-    category = Categories.query.get(id)
+def get_products_by_category(name):
+    print(name)
+    category = Categories.query.filter_by(category_name=name).first()
+    print(category)
 
     if category is None:
         return jsonify({"error": "Category not found"}), 404
 
-    products = Products.query.filter_by(category=id).all()
+    products = Products.query.filter_by(category=category.id).all()
     json_products = list(map(lambda product: product.to_json(), products))
 
     return jsonify({"products": json_products})
