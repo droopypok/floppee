@@ -73,12 +73,14 @@ class Products(db.Model):
     seller_id = db.Column(db.Integer, ForeignKey('users.id'))
 
     def to_json(self):
+        user = Users.query.filter_by(id=self.seller_id).first()
         return {
             "id": self.id,
             "productName": self.product_name,
             "description": self.description,
             "category": self.category,
-            "sellerId": self.seller_id
+            "sellerId": self.seller_id,
+            "sellerName": user.username
         }
 
 
