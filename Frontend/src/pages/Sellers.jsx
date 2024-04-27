@@ -17,6 +17,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/User";
+import ProductUpdateModal from "../components/ProductUpdateModal";
 
 const Sellers = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -25,6 +26,10 @@ const Sellers = () => {
   const [productCategory, setProductCategory] = useState("laptop");
 
   const [sellerProducts, setSellerProducts] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const fetchData = useFetch();
   const userCtx = useContext(UserContext);
@@ -180,7 +185,9 @@ const Sellers = () => {
                       </CardActionArea>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">Update</Button>
+                      <Button size="small" onClick={() => handleOpen()}>
+                        Update
+                      </Button>
                       <Button
                         size="small"
                         onClick={() => {
@@ -194,6 +201,12 @@ const Sellers = () => {
                 </Grid>
               );
             })}
+
+          <ProductUpdateModal
+            handleClose={handleClose}
+            handleOpen={handleOpen}
+            open={open}
+          ></ProductUpdateModal>
         </Grid>
       </Container>
     </>
