@@ -239,3 +239,5 @@ def get_product_type_selections_by_product_type_id(id):
     return jsonify({"product_type_selections": json_product_type_selections})
 
 
+
+

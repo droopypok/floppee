@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Link, SvgIcon } from "@mui/material";
+import { Link } from "@mui/material";
+import UserContext from "../context/User";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 const NavBar = () => {
+  const userCtx = useContext(UserContext);
+
+  console.log(userCtx);
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -18,11 +24,28 @@ const NavBar = () => {
               </Link>
             </Typography>
 
-            <Button color="inherit">
-              <Link href="/login" color="inherit" underline="none">
-                Login
-              </Link>
-            </Button>
+            {userCtx.role === "seller" && (
+              <Button color="inherit">
+                <Link href="/sellers" color="inherit" underline="none">
+                  sellers view
+                </Link>
+              </Button>
+            )}
+
+            {!userCtx.accessToken ? (
+              <Button color="inherit">
+                <Link href="/login" color="inherit" underline="none">
+                  Login
+                </Link>
+              </Button>
+            ) : (
+              <Button color="inherit" startIcon={<ShoppingCartIcon />}>
+                Cart
+              </Button>
+              //   <ShoppingCartIcon>
+              //     <IconButton></IconButton>
+              //   </ShoppingCartIcon>
+            )}
           </Toolbar>
         </AppBar>
       </Box>

@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import { jwtDecode } from "jwt-decode";
+import UserContext from "../context/User.jsx";
+import { useNavigate } from "react-router-dom";
+
+//MUI Imports
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -14,6 +18,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const Login = () => {
+  const userCtx = useContext(UserContext);
+  const navigate = useNavigate();
+
   const defaultTheme = createTheme();
   const fetchData = useFetch();
   const [username, setUsername] = useState("");
@@ -27,16 +34,14 @@ const Login = () => {
       undefined
     );
     if (res.ok) {
-      console.log("logged in");
-      console.log(res);
-      console.log(res.data.access);
-      console.log(res.data.refresh);
+      userCtx.setAccessToken(res.data.access);
+
       const decoded = jwtDecode(res.data.access);
-      console.log(decoded.role);
-      console.log(decoded.username);
+      userCtx.setRole(decoded.role);
+      userCtx.setUsername(decoded.username);
+
+      navigate("/main");
     }
-    console.log(username);
-    console.log(password);
   };
 
   const handleSubmit = (e) => {

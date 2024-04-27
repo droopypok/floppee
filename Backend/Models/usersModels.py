@@ -179,7 +179,7 @@ class Orders (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
     product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
-    shopping_cart_id = db.Column(db.Integer, ForeignKey('shopping_cart_id'))
+    shopping_cart_id = db.Column(db.Integer, ForeignKey('shopping_cart.id'))
     shipping_address = db.Column(db.Integer, ForeignKey('addresses.id'))
     status = db.Column(db.String(20), nullable=False, default='pending')
     
