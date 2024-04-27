@@ -10,6 +10,7 @@ import {
   Card,
   CardActionArea,
   CardMedia,
+  InputLabel,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
@@ -39,6 +40,7 @@ const Sellers = () => {
       undefined
     );
     if (res.ok) {
+      getSellerProducts();
       console.log("created new product!");
     }
   };
@@ -111,7 +113,9 @@ const Sellers = () => {
                   onChange={(e) => setProductDescription(e.target.value)}
                 ></TextField>
 
+                <InputLabel id="Category-select">Category</InputLabel>
                 <Select
+                  id="Category-select"
                   label="Category"
                   value={productCategory}
                   onChange={(e) => {
@@ -143,7 +147,6 @@ const Sellers = () => {
             </Grid>
           </Box>
         </Box>
-        <Button onClick={() => getSellerProducts()}>get seller</Button>
 
         <Grid container spacing={2}>
           {sellerProducts.length > 0 &&
