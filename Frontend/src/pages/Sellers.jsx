@@ -7,8 +7,9 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
+import UserContext from "../context/User";
 
 const Sellers = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -17,6 +18,7 @@ const Sellers = () => {
   const [productCategory, setProductCategory] = useState("laptop");
 
   const fetchData = useFetch();
+  const userCtx = useContext(UserContext);
 
   const createNewProduct = async () => {
     const res = await fetchData(
@@ -26,9 +28,13 @@ const Sellers = () => {
         name: productName,
         description: productDescription,
         category: productCategory,
+        username: userCtx.username,
       },
       undefined
     );
+    if (res.ok) {
+      console.log("created new product!");
+    }
   };
 
   const getAllCategories = async () => {
@@ -45,7 +51,7 @@ const Sellers = () => {
   }, []);
 
   const handleSubmit = (e) => {
-    e.preventDefault;
+    e.preventDefault();
     createNewProduct();
   };
 
@@ -59,6 +65,7 @@ const Sellers = () => {
           alignItems: "center",
         }}
       >
+        {/* Create Products Input Form */}
         <Typography component="h1" variant="h5">
           Create new products
         </Typography>

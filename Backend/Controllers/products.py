@@ -1,4 +1,4 @@
-from ..Models.usersModels import Products, Product_Item, Product_Type_Selections, Product_Types, Categories
+from ..Models.usersModels import Products, Product_Item, Product_Type_Selections, Product_Types, Categories, Users
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
@@ -32,18 +32,20 @@ def get_product(id):
 def create_product():
     data = request.json
 
-    required_fields = ['description', 'name', 'category']
+    required_fields = ['description', 'name', 'category', "username"]
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
     
-
     description = data['description']
     name = data['name']
     category_name = data['category']
+    seller_name = data['username']
 
     category = Categories.query.filter_by(category_name=category_name).first()
+    seller = Users.query.filter_by(username = seller_name).first()
+    
 
-    new_product = Products(description=description, product_name=name, category=category.id)
+    new_product = Products(description=description, product_name=name, category=category.id, seller_id=seller.id)
 
     db.session.add(new_product)
     db.session.commit()
