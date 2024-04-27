@@ -18,20 +18,56 @@ def get_all_products():
 @products_bp.route('/products/<int:id>/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def get_product(id):
-    print(id)
-    product = Products.query.filter_by(seller_id = id)
 
-    print(product)
+    # product = Products.query.join(Categories, Products.category == Categories.id).filter_by(Products.seller_id = id)
 
-    json_products = list(map(lambda x: x.to_json(), product))
+    # products = db.session.query(
+    #     Products.id,
+    #     Products.description,
+    #     Products.product_image,
+    #     Products.product_name,
+    #     Categories.category_name.label("category"),
+    #     Products.seller_id
+    # ).join(
+    #     Categories, Products.category == Categories.id
+    # ).filter(
+    #     Products.seller_id == id
+    # ).all()
 
-    print(json_products)
+    # print(products)
+
+    # json_products = list(map(lambda x: x.to_json(), products))
+
+    # if json_products:
+    #     return jsonify({"product": json_products})
+    
+    # else:
+    #     return jsonify({"error": "NO product found"}), 400
+    products = db.session.query(
+        Products.id,
+        Products.description,
+        Products.product_image,
+        Products.product_name,
+        Categories.category_name.label("category"),
+        Products.seller_id
+    ).join(
+        Categories, lambda: Products.category == Categories.id
+    ).filter(
+        Products.seller_id == id
+    ).all()
+
+    json_products = list(map(lambda product: {
+        "id": product.id,
+        "productName": product.product_name,
+        "description": product.description,
+        "category": product.category,
+        "sellerId": product.seller_id
+    }, products))
 
     if json_products:
         return jsonify({"product": json_products})
-    
     else:
-        return jsonify({"error": "NO product found"}), 400
+        return jsonify({"error": "No product found"}), 400
 
 
 @products_bp.route('/create_product/', methods=["POST", "OPTIONS"])

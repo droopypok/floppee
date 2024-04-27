@@ -24,11 +24,24 @@ const Sellers = () => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCategory, setProductCategory] = useState("laptop");
+  const [selectedProduct, setSelectedProducts] = useState([]);
 
-  const [sellerProducts, setSellerProducts] = useState([]);
+  const [sellerProducts, setSellerProducts] = useState({
+    id: "",
+    name: "",
+    description: "",
+  });
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (id, productDescription, productName, productCategory) => {
+    setSelectedProducts({
+      id: id,
+      name: productName,
+      description: productDescription,
+      category: productCategory,
+    });
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const fetchData = useFetch();
@@ -174,38 +187,56 @@ const Sellers = () => {
           {sellerProducts.length > 0 &&
             sellerProducts.map((item) => {
               return (
-                <Grid key={item.id} item sm={3}>
-                  <Card>
-                    <CardContent>
-                      <CardActionArea onClick={() => console.log("Clicked")}>
-                        <CardMedia component="img" height="140" />
-                        <h3>{item.productName}</h3>
-                        <h3>{item.description}</h3>
-                        <h3>{item.id}</h3>
-                      </CardActionArea>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" onClick={() => handleOpen()}>
-                        Update
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          deleteProduct(item.id);
-                        }}
-                      >
-                        Delete Product
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
+                <>
+                  <Grid key={item.id} item sm={3}>
+                    <Card>
+                      <CardContent>
+                        <CardActionArea onClick={() => console.log("Clicked")}>
+                          <CardMedia component="img" height="140" />
+                          <h3>{item.productName}</h3>
+                          <h3>{item.description}</h3>
+                          <h3>{item.id}</h3>
+                          <h3>{item.category}</h3>
+                        </CardActionArea>
+                      </CardContent>
+                      <CardActions>
+                        <Button
+                          size="small"
+                          onClick={() =>
+                            handleOpen(
+                              item.id,
+                              item.productName,
+                              item.description,
+                              item.category
+                            )
+                          }
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            deleteProduct(item.id);
+                          }}
+                        >
+                          Delete Product
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                </>
               );
             })}
-
           <ProductUpdateModal
             handleClose={handleClose}
             handleOpen={handleOpen}
             open={open}
+            selectedProduct={selectedProduct}
+            handleSubmit={handleSubmit}
+            setProductName={setProductName}
+            setProductCategory={setProductCategory}
+            setProductDescription={setProductDescription}
+            availableCategories={availableCategories}
           ></ProductUpdateModal>
         </Grid>
       </Container>
