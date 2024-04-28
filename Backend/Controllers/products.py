@@ -45,31 +45,6 @@ def get_product(id):
         return jsonify({"error": "No product found"}), 400
 
 
-# @products_bp.route('/create_product/', methods=["POST", "OPTIONS"])
-# @cross_origin()
-# def create_product():
-#     data = request.json
-
-#     required_fields = ['description', 'name', 'category', 'id', 'productTypes', 'price']
-#     if not all(field in data for field in required_fields):
-#         return jsonify({"error": "Missing required fields"}), 400
-    
-#     description = data['description']
-#     name = data['name']
-#     category_name = data['category']
-#     seller_id = data['id']
-#     product_type_selections = data['productTypes']
-#     product_price = data['price']
-
-#     category = Categories.query.filter_by(category_name=category_name).first()
-    
-#     new_product = Products(description=description, product_name=name, category=category.id, seller_id=seller_id)
-
-#     db.session.add(new_product)
-#     db.session.commit()
-
-#     return jsonify({"message": "Product created successfully"}), 200
-
 @products_bp.route('/create_product/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def create_product():
@@ -195,6 +170,19 @@ def get_products_by_category(name):
 
 
 
+#Get product by product Id
+@products_bp.route('/productId/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_selected_product(id):
+    product = Products.query.get(id)
+
+    if product:
+        return jsonify({"product": product.to_json()})
+    else:
+        return jsonify({"error": "Product not found"})
+    
+
+
 #Get all product item from product id
 
 @products_bp.route('/product_items/<int:id>/', methods=["GET", "OPTIONS"])
@@ -210,7 +198,7 @@ def get_product_items_by_product_id(id):
 
 
 #Get product item by id
-@products_bp.route('/product_items/<int:id>/', methods=["GET", "OPTIONS"])
+@products_bp.route('/item/<int:id>/', methods=["GET", "OPTIONS"])
 @cross_origin()
 def get_product_item(id):
     product_item = Product_Item.query.get(id)
