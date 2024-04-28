@@ -138,13 +138,15 @@ class Product_Type_Selections(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     product_type_id = db.Column(db.Integer, ForeignKey('product_types.id'))
+    product_id = db.Column(db.Integer, ForeignKey('products.id'))
     option = db.Column(db.String(50))
 
     def to_json(self):
         return {
             "id": self.id,
             "option": self.option,
-            "productTypeId": self.product_type_id,
+            "productId": self.product_id,
+            "productTypeId": self.product_type_id
         }
         
 
@@ -154,6 +156,13 @@ class Product_Options(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_type_selection_id = db.Column(db.Integer, ForeignKey('product_type_selections.id'))
     product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "productTypeSelectionId": self.product_type_selection_id,
+            "product_item_id": self.product_item_id
+        }
 
 
 

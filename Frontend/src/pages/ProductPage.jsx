@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import { useParams } from "react-router-dom";
-import { Container, Grid, Typography } from "@mui/material";
+import { Button, Container, Grid, Typography } from "@mui/material";
 
 const ProductPage = () => {
   const fetchData = useFetch();
@@ -31,7 +31,7 @@ const ProductPage = () => {
     );
     if (res.ok) {
       console.log(res.data);
-      setProductItems(res.data.product);
+      setProductItems(res.data.product_items);
     } else {
       console.log("There is an error");
     }
@@ -50,6 +50,15 @@ const ProductPage = () => {
             <Typography>Product name: {product.productName}</Typography>
             <Typography>Product description: {product.description}</Typography>
             <Typography>Seller name: {product.sellerName}</Typography>
+            {productItems &&
+              productItems.map((item, idx) => {
+                return (
+                  <>
+                    <Button>{item.options}</Button>
+                    <Typography>{item.price}</Typography>
+                  </>
+                );
+              })}
           </Grid>
         </Grid>
       </Container>

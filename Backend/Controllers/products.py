@@ -94,6 +94,32 @@ def create_product():
     return jsonify({"message": "Product created successfully"}), 200
     
 
+@products_bp.route('/create_new_product/', methods=["POST", "OPTIONS"])
+@cross_origin()
+def create_new_product():
+    data = request.json
+
+    required_fields = ['description', 'name', 'category', 'id',]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    description = data['description']
+    product_name = data['name']
+    category = data['category']
+    seller_id = data['id']
+
+    category = Categories.query.filter_by(category_name=category).first()
+    
+    new_product = Products(description=description, product_name=product_name, category=category.id, seller_id=seller_id)
+    db.session.add(new_product)
+    db.session.commit()
+
+    new_product_id = new_product.id
+
+    return jsonify({"message": "created product successffully", "product_id": new_product_id})
+
+    
+
 
 
 @products_bp.route('/update_product/<int:id>/', methods=["PATCH", "OPTIONS"])
@@ -193,7 +219,25 @@ def get_product_items_by_product_id(id):
     if not product_items:
         return jsonify({"error": "No product items found for the given product ID"}), 404
 
-    json_product_items = list(map(lambda item: item.to_json(), product_items))
+    json_product_items = []
+    for item in product_items:
+        product_options = (
+            db.session.query(Product_Options, Product_Type_Selections.option)
+            .join(Product_Type_Selections, Product_Options.product_type_selection_id == Product_Type_Selections.id)
+            .join(Product_Types, Product_Type_Selections.product_type_id == Product_Types.id)
+            .filter(Product_Options.product_item_id == item.id)
+            .all()
+        )
+        options = [option.option for option in product_options]
+        json_product_items.append({
+            "id": item.id,
+            "productID": item.product_id,
+            "quantity": item.quantity,
+            "productImage": item.product_image,
+            "price": item.price,
+            "options": options
+        })
+
     return jsonify({"product_items": json_product_items})
 
 
@@ -306,4 +350,33 @@ def get_product_type_selections_by_product_type_id(id):
 
 
 
+@products_bp.route('/create_options/', methods=["PUT", "OPTIONS"])
+@cross_origin()
+def create_options_productId():
+    data = request.json
 
+    required_fields = ['productId', 'productTypeId', 'option', ]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    product_id = data['productId']
+    product_type_id = data['productTypeId']
+    option = data['option']
+
+    new_option = Product_Type_Selections(product_id=product_id, product_type_id=product_type_id, option=option, )
+    db.session.add(new_option)
+    db.session.commit()
+
+    return jsonify({"message": "Created option!"}), 200
+
+
+@products_bp.route('/product_options/<int:id>/', methods=["POST", "OPTIONS"])
+@cross_origin()
+def get_all_product_options(id):
+    product_options = Product_Type_Selections.query.filter_by(product_id=id).all()
+
+    json_product_options = list(map(lambda x: x.to_json(), product_options))
+
+    return jsonify({"productOptions": json_product_options})
+
+    

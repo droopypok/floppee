@@ -27,21 +27,25 @@ import ProductUpdateModal from "../components/ProductUpdateModal";
 
 const Sellers = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [availableTypeSelector, setAvailableTypeSelector] = useState([]);
+
+  // For Create New Product
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCategory, setProductCategory] = useState("laptop");
 
-  const [availableTypeSelector, setAvailableTypeSelector] = useState([]);
-  const [availableOptions, setAvailableOptions] = useState([]);
+  // For Create Product_Item
+  const [productId, setProductId] = useState(0); // Main product Id
+  const [productType, setProductType] = useState([]); // Product Type (e.g. Colour, Sizing)
+  const [productOptions, setProductOptions] = useState(""); // Store option under ^^
+  const [productPrice, setProductPrice] = useState(0); // for Individual product item
+  const [itemQuantity, setItemQuantity] = useState(0); // for product_item quantity
+  const [itemOptions, setItemOptions] = useState([]); // might be useless who knows
 
-  const [productType, setProductType] = useState([]);
-  const [productOptions, setProductOptions] = useState([]);
-  const [productPrice, setProductPrice] = useState(0);
-  const [productSelections, setProductSelections] = useState([]);
-
+  // For Modal
   const [selectedProduct, setSelectedProducts] = useState([]);
 
-  const [newProduct, setNewProduct] = useState(false);
+  const [newProduct, setNewProduct] = useState(false); // to change view
 
   const [sellerProducts, setSellerProducts] = useState({
     id: "",
@@ -50,7 +54,11 @@ const Sellers = () => {
     category: "",
   });
 
+  const fetchData = useFetch();
+  const userCtx = useContext(UserContext);
   const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+
   const handleOpen = (id, productName, productDescription, productCategory) => {
     setSelectedProducts({
       id: id,
@@ -60,30 +68,25 @@ const Sellers = () => {
     });
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
 
-  const fetchData = useFetch();
-  const userCtx = useContext(UserContext);
-
-  const createNewProduct = async () => {
+  const createMainProduct = async () => {
     const res = await fetchData(
-      "/create_product/",
+      "/create_new_product/",
       "POST",
       {
         name: productName,
         description: productDescription,
         category: productCategory,
         id: userCtx.userId,
-        productPrice: productPrice,
-        productTypes: productSelections,
       },
       undefined
     );
     if (res.ok) {
+      setProductId(res.data.product_id);
       getSellerProducts();
-      setNewProduct(true);
-      console.log("created new product!");
+      console.log("Created main product :)) ha ha ha ");
     }
+    console.log(productId);
   };
 
   const getAllProductSelectors = async () => {
@@ -136,7 +139,8 @@ const Sellers = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createNewProduct();
+    // createNewProduct();
+    createMainProduct();
   };
 
   // useEffect onLoad
@@ -148,7 +152,6 @@ const Sellers = () => {
 
   useEffect(() => {
     getAllProductSelectors();
-    setProductSelections([]);
   }, [productCategory, setProductCategory]);
 
   useEffect(() => {
@@ -159,35 +162,51 @@ const Sellers = () => {
     }
   }, [availableTypeSelector]);
 
-  const addOptionsToId = (e) => {
-    if (!productType) return;
-
-    const idExists = productSelections.findIndex((item) => {
-      return item.type === productType;
-    });
-
-    const optionExists = productSelections.some((item) =>
-      item.options.includes(productOptions)
+  const addOptionsToProductId = async () => {
+    const res = await fetchData(
+      "/create_options/",
+      "PUT",
+      {
+        productId: productId,
+        productTypeId: productType,
+        option: productOptions,
+      },
+      undefined
     );
-
-    if (optionExists) {
-      console.log("already inside bitch");
-      return;
-    }
-
-    if (productOptions !== "") {
-      if (idExists === -1) {
-        setProductSelections([
-          ...productSelections,
-          { type: productType, options: [productOptions] },
-        ]);
-      } else {
-        const updatedProductSelections = [...productSelections];
-        updatedProductSelections[idExists].options.push(productOptions);
-        setProductSelections(updatedProductSelections);
-      }
+    if (res.ok) {
+      console.log("Created new option :D ");
       setProductOptions("");
+      getAllProductOptions();
     }
+  };
+
+  const createNewProductItem = async () => {
+    const res = await fetchData(
+      "/product_items/",
+      "PUT",
+      {
+        productId: productId,
+        quantity: itemQuantity,
+        price: productPrice,
+      },
+      undefined
+    );
+    if (res.ok) {
+      console.log("Created new product item :D ");
+    }
+  };
+
+  const getAllProductOptions = async () => {
+    const res = await fetchData(
+      `/product_options/${productId}/`,
+      "POST",
+      undefined,
+      undefined
+    );
+    if (res.ok) {
+      setItemOptions(res.data.productOptions);
+    }
+    console.log(itemOptions);
   };
 
   return (
@@ -253,6 +272,15 @@ const Sellers = () => {
                     </Select>
                   </InputLabel>
 
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Create new product
+                  </Button>
+
                   <InputLabel id="item-type-selector">
                     Item Types
                     <Select
@@ -291,34 +319,53 @@ const Sellers = () => {
                         setProductOptions(e.target.value);
                       }}
                     />
-                    <Button onClick={() => addOptionsToId()}>Add Option</Button>
+                    <Button onClick={() => addOptionsToProductId()}>
+                      Add Option
+                    </Button>
                   </Box>
 
-                  <Box container>
-                    {productSelections.length > 0 &&
-                      productSelections.map((item) => {
-                        const type = availableTypeSelector.find(
-                          (type) => type.id === item.type
-                        );
+                  <br></br>
+                  <h1>CREATE NEW PRODUCT ITEM</h1>
 
-                        const typeName = type ? type.option : "";
-
-                        return (
-                          <>
-                            <Typography item variant="h5">
-                              {typeName}
-                            </Typography>
-                            {item.options.map((options) => {
-                              return (
-                                <Typography item variant="h6">
-                                  {options}
-                                </Typography>
-                              );
-                            })}
-                          </>
-                        );
+                  <Grid>
+                    <Grid container>
+                      {availableTypeSelector.length > 0 &&
+                        availableTypeSelector.map((item) => {
+                          return (
+                            <Grid item sm={4} textAlign={"center"}>
+                              {item.option}
+                              {itemOptions.length > 0 &&
+                                itemOptions.map((option) => {
+                                  if (option.productTypeId === item.id) {
+                                    return <p>{option.option}</p>;
+                                  }
+                                })}
+                            </Grid>
+                          );
+                        })}
+                    </Grid>
+                    {itemOptions.length > 0 &&
+                      itemOptions.map((item) => {
+                        return <Button value={item.id}>{item.option}</Button>;
                       })}
-                  </Box>
+                  </Grid>
+
+                  <FormControl fullWidth sx={{ m: 1 }}>
+                    <InputLabel htmlFor="outlined-adornment-amount">
+                      Quantity
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-amount"
+                      startAdornment={
+                        <InputAdornment position="start">QTY</InputAdornment>
+                      }
+                      onChange={(e) => {
+                        setItemQuantity(e.target.value);
+                        console.log(productPrice);
+                      }}
+                      label="Quantity"
+                    />
+                  </FormControl>
 
                   <FormControl fullWidth sx={{ m: 1 }}>
                     <InputLabel htmlFor="outlined-adornment-amount">
@@ -336,20 +383,12 @@ const Sellers = () => {
                       label="Amount"
                     />
                   </FormControl>
-
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Create new product
-                  </Button>
                 </Grid>
               </Grid>
             </>
           </Box>
         </Box>
+        <br />
 
         {/* Seller product view */}
         <Grid container spacing={2}>
