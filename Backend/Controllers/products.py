@@ -237,10 +237,11 @@ def delete_product_item(id):
 
 # Product Options By Category
 
-@products_bp.route('/product_types/<int:id>/', methods=["GET", "OPTIONS"])
+@products_bp.route('/products_types/<name>/', methods=["GET", "OPTIONS"])
 @cross_origin()
-def get_product_types_by_category_id(id):
-    product_types = Product_Types.query.filter_by(category=id).all()
+def get_product_types_by_category(name):
+    category = Categories.query.filter_by(category_name=name).first()
+    product_types = Product_Types.query.filter_by(category=category.id).all()
 
     if not product_types:
         return jsonify({"error": "No product types were found"}), 404

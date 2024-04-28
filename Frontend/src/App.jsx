@@ -7,6 +7,7 @@ import NavBar from "./components/NavBar";
 import UserContext from "./context/User.jsx";
 import Sellers from "./pages/Sellers.jsx";
 import Category from "./pages/Category.jsx";
+import ProductPage from "./pages/ProductPage.jsx";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -36,6 +37,7 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route path="sellers" element={<Sellers />} />
           <Route path="category/:category" element={<Category />} />
+          <Route path="product/:id" element={<ProductPage />} />
         </Routes>
       </UserContext.Provider>
     </>

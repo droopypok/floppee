@@ -13,6 +13,7 @@ import {
   InputLabel,
   CardContent,
   CardActions,
+  Input,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
@@ -24,6 +25,8 @@ const Sellers = () => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCategory, setProductCategory] = useState("laptop");
+  const [availableTypeSelector, setAvailableTypeSelector] = useState([]);
+  const [productType, setProductType] = useState("");
   const [selectedProduct, setSelectedProducts] = useState([]);
 
   const [sellerProducts, setSellerProducts] = useState({
@@ -39,7 +42,7 @@ const Sellers = () => {
       id: id,
       name: productName,
       description: productDescription,
-      category: productCategory,
+      category: productCategory.category,
     });
     setOpen(true);
   };
@@ -63,6 +66,19 @@ const Sellers = () => {
     if (res.ok) {
       getSellerProducts();
       console.log("created new product!");
+    }
+  };
+
+  const getAllProductSelectors = async () => {
+    const res = await fetchData(
+      "/products_types/" + productCategory + "/",
+      "GET",
+      undefined,
+      undefined
+    );
+
+    if (res.ok) {
+      setAvailableTypeSelector(res.data.product_types);
     }
   };
 
@@ -110,11 +126,13 @@ const Sellers = () => {
   useEffect(() => {
     getAllCategories();
     getSellerProducts();
+    getAllProductSelectors();
   }, []);
 
   useEffect(() => {
-    console.log(sellerProducts);
-  }, [sellerProducts]);
+    console.log(productCategory);
+    getAllProductSelectors();
+  }, [productCategory, setProductCategory]);
 
   return (
     <>
@@ -148,32 +166,61 @@ const Sellers = () => {
                 <TextField
                   fullWidth
                   required
+                  multiline
                   label="Product Description"
                   onChange={(e) => setProductDescription(e.target.value)}
                 ></TextField>
 
-                <InputLabel id="Category-select">Category</InputLabel>
-                <Select
-                  id="Category-select"
-                  label="Category"
-                  value={productCategory}
-                  onChange={(e) => {
-                    setProductCategory(e.target.value);
-                  }}
-                >
-                  {availableCategories.length > 0 &&
-                    availableCategories.map((item) => {
-                      return (
-                        <MenuItem
-                          id={item.id}
-                          key={item.id}
-                          value={item.category}
-                        >
-                          {item.category}
-                        </MenuItem>
-                      );
-                    })}
-                </Select>
+                <InputLabel id="Category-select">
+                  Category
+                  <Select
+                    id="Category-select"
+                    label="Category"
+                    value={productCategory}
+                    onChange={(e) => {
+                      setProductCategory(e.target.value);
+                    }}
+                  >
+                    {availableCategories.length > 0 &&
+                      availableCategories.map((item) => {
+                        return (
+                          <MenuItem
+                            id={item.id}
+                            key={item.id}
+                            value={item.category}
+                          >
+                            {item.category}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                </InputLabel>
+
+                <InputLabel id="item-type-selector">
+                  Item Types
+                  <Select
+                    id="item-type-selector"
+                    label="Item Types"
+                    placeholder="Select Type"
+                    value={productType}
+                    onChange={(e) => {
+                      setProductType(e.target.value);
+                    }}
+                  >
+                    {availableTypeSelector.length > 0 &&
+                      availableTypeSelector.map((item) => {
+                        return (
+                          <MenuItem
+                            id={item.id}
+                            key={item.id}
+                            value={item.option}
+                          >
+                            {item.option}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                </InputLabel>
                 <Button
                   type="submit"
                   fullWidth
