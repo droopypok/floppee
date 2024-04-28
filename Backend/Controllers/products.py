@@ -1,4 +1,4 @@
-from ..Models.usersModels import Products, Product_Item, Product_Type_Selections, Product_Types, Categories, Users
+from ..Models.usersModels import Products, Product_Item, Product_Type_Selections, Product_Types, Categories, Users, Product_Options
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
@@ -45,12 +45,37 @@ def get_product(id):
         return jsonify({"error": "No product found"}), 400
 
 
+# @products_bp.route('/create_product/', methods=["POST", "OPTIONS"])
+# @cross_origin()
+# def create_product():
+#     data = request.json
+
+#     required_fields = ['description', 'name', 'category', 'id', 'productTypes', 'price']
+#     if not all(field in data for field in required_fields):
+#         return jsonify({"error": "Missing required fields"}), 400
+    
+#     description = data['description']
+#     name = data['name']
+#     category_name = data['category']
+#     seller_id = data['id']
+#     product_type_selections = data['productTypes']
+#     product_price = data['price']
+
+#     category = Categories.query.filter_by(category_name=category_name).first()
+    
+#     new_product = Products(description=description, product_name=name, category=category.id, seller_id=seller_id)
+
+#     db.session.add(new_product)
+#     db.session.commit()
+
+#     return jsonify({"message": "Product created successfully"}), 200
+
 @products_bp.route('/create_product/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def create_product():
     data = request.json
 
-    required_fields = ['description', 'name', 'category', 'id']
+    required_fields = ['description', 'name', 'category', 'id', 'productTypes', 'productPrice']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
     
@@ -58,15 +83,42 @@ def create_product():
     name = data['name']
     category_name = data['category']
     seller_id = data['id']
+    product_type_selections = data['productTypes']
+    product_item_price = data['productPrice']
 
     category = Categories.query.filter_by(category_name=category_name).first()
     
     new_product = Products(description=description, product_name=name, category=category.id, seller_id=seller_id)
-
     db.session.add(new_product)
     db.session.commit()
 
+    for product_type in product_type_selections:
+        product_type_id = product_type['type']
+        options = product_type['options']
+        for option in options:
+            # Create a new Product_Item associated with the created product for each product type
+            new_product_item = Product_Item(
+                product_id=new_product.id,
+                quantity=0,  # Assuming initial quantity is 0
+                product_image='',  # Empty string for product image, you may adjust this based on your requirements
+                price=product_item_price,  # Set price to product_item_price
+            )
+            db.session.add(new_product_item)
+            db.session.commit()
+
+            # Create ProductTypeSelection entries for each product type option
+            new_product_type_selection = Product_Type_Selections(product_type_id=product_type_id, option=option)
+            db.session.add(new_product_type_selection)
+            db.session.commit()
+
+            # Associate Product_Type_Selection with Product_Item through Product_Options
+            new_product_option = Product_Options(product_type_selection_id=new_product_type_selection.id, product_item_id=new_product_item.id)
+            db.session.add(new_product_option)
+            db.session.commit()
+
     return jsonify({"message": "Product created successfully"}), 200
+    
+
 
 
 @products_bp.route('/update_product/<int:id>/', methods=["PATCH", "OPTIONS"])
@@ -193,7 +245,7 @@ def create_product_item():
     db.session.add(new_product_item)
     db.session.commit()
 
-    return jsonify({"message": "Product item created successfully"}), 201
+    return jsonify({"message": "Product item created successfully"}), 200
 
 
 

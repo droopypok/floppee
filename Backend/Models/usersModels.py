@@ -91,7 +91,7 @@ class Product_Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, ForeignKey('products.id'))
     quantity = db.Column(db.Integer, nullable=False)
-    product_image = db.Column(db.Integer, nullable=False)
+    product_image = db.Column(db.Text, nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
     def to_json(self):
@@ -138,19 +138,22 @@ class Product_Type_Selections(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     product_type_id = db.Column(db.Integer, ForeignKey('product_types.id'))
-    product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
     option = db.Column(db.String(50))
 
     def to_json(self):
-        product_type_selection = {
+        return {
             "id": self.id,
             "option": self.option,
             "productTypeId": self.product_type_id,
         }
-        if self.product_item_id is not None: 
-            product_type_selection["productItemId"] = self.product_item_id
-        return product_type_selection
         
+
+class Product_Options(db.Model):
+    __tablename__ = 'product_options'
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_type_selection_id = db.Column(db.Integer, ForeignKey('product_type_selections.id'))
+    product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
 
 
 
