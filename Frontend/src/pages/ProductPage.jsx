@@ -88,7 +88,6 @@ const ProductPage = () => {
   useEffect(() => {
     getProductById();
     getProductItem();
-    test();
   }, []);
 
   const handleSelectProductItem = (id, price, quantity) => {

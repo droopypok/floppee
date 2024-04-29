@@ -22,16 +22,18 @@ def view_cart(id):
     .filter(Shopping_Cart_Item.userId == id, Shopping_Cart_Item.bought == False)\
     .all()
 
+    print(cart_items)
+
     if cart_items:
         json_cart_items = []
-        for cart_item, product_item, product, user in cart_items:
+        for cart_item, product_item, product, seller in cart_items:
       
             json_cart_item = {
                 "id": cart_item.id,
                 "productId": product.id,
                 "productName": product.product_name,
                 "quantity": cart_item.quantity,
-                "sellerName": user.username,
+                "sellerName": seller.username,
                 "price": product_item.price 
             }
             json_cart_items.append(json_cart_item)
