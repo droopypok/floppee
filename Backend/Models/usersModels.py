@@ -87,7 +87,6 @@ class Products(db.Model):
         }
 
 
-
 class Product_Item(db.Model):
     __tablename__ = 'product_item'
 
