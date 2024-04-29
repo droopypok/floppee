@@ -25,21 +25,24 @@ def view_cart(id):
 
 
 
-@orders_bp.route('/add_to_cart/', methods=["POST"])
+@orders_bp.route('/add_to_cart/', methods=["POST", "OPTIONS"])
 @cross_origin()
 def add_to_cart():
     data = request.json
-    user_id = data['user_id']
-    product_id = data['product_id']
+    print(data)
+
+    user_id = data['userId']
+    product_id = data['productId']
+    quantity = data['quantity']
 
     # Check if the item already exists in the shopping cart
-    existing_item = Shopping_Cart_Item.query.filter_by(user_id=user_id, product_id=product_id, bought=False).first()
+    existing_item = Shopping_Cart_Item.query.filter_by(userId=user_id, product_id=product_id, bought=False).first()
 
     if existing_item:
-        return jsonify({"error": "Item already exists in the shopping cart"}), 400
+        quantity += 1
 
     # Add the item to the shopping cart
-    new_cart_item = Shopping_Cart_Item(user_id=user_id, product_id=product_id)
+    new_cart_item = Shopping_Cart_Item(userId=user_id, product_id=product_id, quantity=quantity)
     db.session.add(new_cart_item)
     db.session.commit()
 
@@ -80,6 +83,7 @@ def checkout():
     return jsonify({"message": "Checkout successful"}), 200
 
 ## orders
+
 
 ## shipping orders
 

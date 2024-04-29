@@ -174,12 +174,14 @@ class Shopping_Cart_Item(db.Model):
     product_id = db.Column(db.Integer, ForeignKey('product_item.id'))
     quantity = db.Column(db.Integer)
     bought = db.Column(db.Boolean, default=False)
+    userId = db.Column(db.Integer, ForeignKey('users.id'))
 
     def to_json(self):
         return {
             "id": self.id,
             "productId": self.product_id,
-            "bought": self.bought
+            "bought": self.bought,
+            "quantity": self.quantity
         }
 
 

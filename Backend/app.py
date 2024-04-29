@@ -23,10 +23,12 @@ def create_app():
     from .Controllers.users import users_bp
     from .Controllers.addresses import address_bp
     from .Controllers.products import products_bp
+    from .Controllers.orders import orders_bp
 
     app.register_blueprint(users_bp)
     app.register_blueprint(address_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(orders_bp)
 
     db.init_app(app)
     jwt.init_app(app)
