@@ -52,13 +52,15 @@ const ProductPage = () => {
             <Typography>Seller name: {product.sellerName}</Typography>
             {productItems &&
               productItems.map((item, idx) => {
-                return (
-                  <>
-                    <Button>{item.options}</Button>
-                    <Typography>{item.price}</Typography>
-                  </>
-                );
+                if (item.options.length > 0)
+                  return (
+                    <>
+                      <Button>Options: {item.options}</Button>
+                      <Typography>Price: ${item.price}</Typography>
+                    </>
+                  );
               })}
+            <Button>Add to Cart</Button>
           </Grid>
         </Grid>
       </Container>

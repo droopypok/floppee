@@ -158,7 +158,11 @@ def delete_product(id):
 
     if product is None:
         return jsonify({"error": "Product not found"}), 400
-
+    
+    related_records = db.session.query(Product_Type_Selections).filter_by(product_id=id).all()
+    for record in related_records:
+        db.session.delete(record)
+    
     db.session.delete(product)
     db.session.commit()
 
@@ -379,4 +383,63 @@ def get_all_product_options(id):
 
     return jsonify({"productOptions": json_product_options})
 
+
+@products_bp.route('/create_new_product_item/', methods=["PUT", "OPTIONS"])
+@cross_origin()
+def create_new_product_item():
+    data = request.json
+
+    required_fields = ['productId', 'productItems']
+
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    product_id = data['productId']
+    product_items = data['productItems']
+
+    for item in product_items:
+        try:
+            quantity = int(item['quantity'])
+            price = float(item['price']) # convert cents to dollars
+        except (ValueError, KeyError) as e:
+            return jsonify({"error": f"Invalid data: {e}"}), 400
+
+        new_product_item = Product_Item(
+            product_id=product_id,
+            product_image="https://www.esports.net/wp-content/uploads/2020/05/kekw-emote-2.jpg",
+            quantity=quantity,
+            price=price
+        )
+
+        db.session.add(new_product_item)
+        db.session.commit()
+
+        product_item_id = new_product_item.id
+
+        for option in item.get('options', []):
+            try:
+                product_type_selection_id = int(option['productTypeId'])
+            except (ValueError, KeyError) as e:
+                return jsonify({"error": f"Invalid data: {e}"}), 400
+
+            product_option = Product_Options(
+                product_type_selection_id=product_type_selection_id,
+                product_item_id=product_item_id
+            )
+
+            db.session.add(product_option)
+            db.session.commit()
+
+    return jsonify({"success": True}), 201
+
+
+
     
+
+    
+        
+            
+
+   
+
+

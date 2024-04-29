@@ -19,6 +19,8 @@ import {
   InputAdornment,
   OutlinedInput,
   FormControl,
+  FormGroup,
+  Radio,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
@@ -41,6 +43,9 @@ const Sellers = () => {
   const [productPrice, setProductPrice] = useState(0); // for Individual product item
   const [itemQuantity, setItemQuantity] = useState(0); // for product_item quantity
   const [itemOptions, setItemOptions] = useState([]); // might be useless who knows
+
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [productItem, setProductItem] = useState([]);
 
   // For Modal
   const [selectedProduct, setSelectedProducts] = useState([]);
@@ -85,6 +90,8 @@ const Sellers = () => {
       setProductId(res.data.product_id);
       getSellerProducts();
       console.log("Created main product :)) ha ha ha ");
+      setProductName("");
+      setProductDescription("");
     }
     console.log(productId);
   };
@@ -180,22 +187,6 @@ const Sellers = () => {
     }
   };
 
-  const createNewProductItem = async () => {
-    const res = await fetchData(
-      "/product_items/",
-      "PUT",
-      {
-        productId: productId,
-        quantity: itemQuantity,
-        price: productPrice,
-      },
-      undefined
-    );
-    if (res.ok) {
-      console.log("Created new product item :D ");
-    }
-  };
-
   const getAllProductOptions = async () => {
     const res = await fetchData(
       `/product_options/${productId}/`,
@@ -207,6 +198,65 @@ const Sellers = () => {
       setItemOptions(res.data.productOptions);
     }
     console.log(itemOptions);
+  };
+
+  const handleSelectOptions = (e, id) => {
+    const itemExistIndex = selectedOptions.findIndex(
+      (item) => item.productTypeId === id
+    );
+    if (itemExistIndex === -1) {
+      // Item doesn't exist, add it to the array
+      if (selectedOptions.length < 3) {
+        const tempArr = [...selectedOptions, { productTypeId: id }];
+        setSelectedOptions(tempArr);
+      } else {
+        alert("Maximum of 3!");
+      }
+    } else {
+      // Item already exists, remove it from the array
+      const tempArr = selectedOptions.filter(
+        (item) => item.productTypeId !== id
+      );
+      setSelectedOptions(tempArr);
+    }
+
+    console.log(selectedOptions);
+  };
+
+  const handleAddItems = () => {
+    const tempArr = [
+      ...productItem,
+      { options: selectedOptions, quantity: itemQuantity, price: productPrice },
+    ];
+    setProductItem(tempArr);
+
+    setSelectedOptions([]);
+    setItemQuantity(0);
+    setProductPrice(0);
+  };
+
+  useEffect(() => {
+    console.log(productItem);
+  }, [productItem]);
+
+  const addProductItems = async () => {
+    console.log(productItem);
+    const res = await fetchData(
+      "/create_new_product_item/",
+      "PUT",
+      {
+        productId: productId,
+        productItems: productItem,
+      },
+      undefined
+    );
+    if (res.ok) {
+      console.log("Added product items alhamdulilah");
+      setProductId(0);
+      setProductItem([]);
+    } else {
+      console.log("error");
+    }
   };
 
   return (
@@ -325,7 +375,10 @@ const Sellers = () => {
                   </Box>
 
                   <br></br>
-                  <h1>CREATE NEW PRODUCT ITEM</h1>
+
+                  <Typography variant="h3">
+                    Product Item #{productItem.length + 1}
+                  </Typography>
 
                   <Grid>
                     <Grid container>
@@ -334,20 +387,39 @@ const Sellers = () => {
                           return (
                             <Grid item sm={4} textAlign={"center"}>
                               {item.option}
-                              {itemOptions.length > 0 &&
-                                itemOptions.map((option) => {
-                                  if (option.productTypeId === item.id) {
-                                    return <p>{option.option}</p>;
-                                  }
-                                })}
+                              <FormControl required>
+                                <FormGroup>
+                                  {itemOptions.length > 0 &&
+                                    itemOptions.map((option) => {
+                                      if (option.productTypeId === item.id) {
+                                        return (
+                                          <FormControlLabel
+                                            label={option.option}
+                                            control={
+                                              <Checkbox
+                                                value={option.id}
+                                                onChange={(e) => {
+                                                  handleSelectOptions(
+                                                    e,
+                                                    option.id,
+                                                    item.id
+                                                  );
+                                                }}
+                                                name={option.option}
+                                              />
+                                            }
+                                          >
+                                            {option.option}
+                                          </FormControlLabel>
+                                        );
+                                      }
+                                    })}
+                                </FormGroup>
+                              </FormControl>
                             </Grid>
                           );
                         })}
                     </Grid>
-                    {itemOptions.length > 0 &&
-                      itemOptions.map((item) => {
-                        return <Button value={item.id}>{item.option}</Button>;
-                      })}
                   </Grid>
 
                   <FormControl fullWidth sx={{ m: 1 }}>
@@ -361,8 +433,9 @@ const Sellers = () => {
                       }
                       onChange={(e) => {
                         setItemQuantity(e.target.value);
-                        console.log(productPrice);
+                        console.log(itemQuantity);
                       }}
+                      value={itemQuantity}
                       label="Quantity"
                     />
                   </FormControl>
@@ -380,11 +453,15 @@ const Sellers = () => {
                         setProductPrice(e.target.value);
                         console.log(productPrice);
                       }}
+                      value={productPrice}
                       label="Amount"
                     />
                   </FormControl>
                 </Grid>
               </Grid>
+
+              <Button onClick={handleAddItems}>Add another item</Button>
+              <Button onClick={addProductItems}>Done</Button>
             </>
           </Box>
         </Box>
