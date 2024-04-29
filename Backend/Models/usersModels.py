@@ -72,6 +72,9 @@ class Products(db.Model):
     category = db.Column(db.Integer, ForeignKey('categories.id'))
     seller_id = db.Column(db.Integer, ForeignKey('users.id'))
 
+    items = db.relationship("Product_Item", backref="product", cascade="all, delete-orphan")
+    type_selections = db.relationship("Product_Type_Selections", backref="product", cascade="all, delete-orphan")
+
     def to_json(self):
         user = Users.query.filter_by(id=self.seller_id).first()
         return {
@@ -93,6 +96,10 @@ class Product_Item(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     product_image = db.Column(db.Text, nullable=False)
     price = db.Column(db.Integer, nullable=False)
+
+    options = db.relationship("Product_Options", backref="item", cascade="all, delete-orphan")
+    cart = db.relationship("Shopping_Cart_Item", backref="item", cascade="all, delete-orphan")
+
 
     def to_json(self):
         return {
@@ -156,6 +163,9 @@ class Product_Options(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_type_selection_id = db.Column(db.Integer, ForeignKey('product_type_selections.id'))
     product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
+
+    product = db.relationship("Product_Item", backref="item")
+    type_selections = db.relationship("Product_Type_Selections")
 
     def to_json(self):
         return {

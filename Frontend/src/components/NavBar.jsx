@@ -20,8 +20,9 @@ const NavBar = () => {
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <Link
+                style={{ fontSize: "larger", cursor: "pointer" }}
                 color="inherit"
-                underline="hover"
+                underline="none"
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/");
@@ -47,36 +48,17 @@ const NavBar = () => {
               </Button>
             ) : (
               <>
-                <Badge
-                  badgeContent={userCtx.shoppingCart.length}
-                  color="warning"
-                >
-                  <ShoppingCartIcon
-                    style={{ cursor: "pointer", fontSize: "40" }}
-                    onClick={() => navigate("/cart")}
-                  ></ShoppingCartIcon>
-                  {/* <Button
-                    onClick={() => navigate("/cart")}
-                    color="inherit"
-                    startIcon={<ShoppingCartIcon />}
-                  > */}
-                  {/* {userCtx.shoppingCart && (
-                    <div
-                      className="rounded-circle bg-danger d-flex justify-content-center align-items-center"
-                      style={{
-                        color: "white",
-                        width: "1.2rem",
-                        height: "1.2rem",
-                        position: "absolute",
-                        bottom: 0,
-                        right: 0,
-                      }}
-                    >
-                      {userCtx.shoppingCart.length}
-                    </div>
-                  )} */}
-                  {/* </Button> */}
-                </Badge>
+                {userCtx.shoppingCart && (
+                  <Badge
+                    badgeContent={userCtx.shoppingCart.length}
+                    color="warning"
+                  >
+                    <ShoppingCartIcon
+                      style={{ cursor: "pointer", fontSize: "40" }}
+                      onClick={() => navigate("/cart")}
+                    ></ShoppingCartIcon>
+                  </Badge>
+                )}
               </>
             )}
           </Toolbar>

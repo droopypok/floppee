@@ -42,57 +42,7 @@ def get_product(id):
     if json_products:
         return jsonify({"product": json_products})
     else:
-        return jsonify({"error": "No product found"}), 400
-
-
-@products_bp.route('/create_product/', methods=["POST", "OPTIONS"])
-@cross_origin()
-def create_product():
-    data = request.json
-
-    required_fields = ['description', 'name', 'category', 'id', 'productTypes', 'productPrice']
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    description = data['description']
-    name = data['name']
-    category_name = data['category']
-    seller_id = data['id']
-    product_type_selections = data['productTypes']
-    product_item_price = data['productPrice']
-
-    category = Categories.query.filter_by(category_name=category_name).first()
-    
-    new_product = Products(description=description, product_name=name, category=category.id, seller_id=seller_id)
-    db.session.add(new_product)
-    db.session.commit()
-
-    for product_type in product_type_selections:
-        product_type_id = product_type['type']
-        options = product_type['options']
-        for option in options:
-            # Create a new Product_Item associated with the created product for each product type
-            new_product_item = Product_Item(
-                product_id=new_product.id,
-                quantity=0,  # Assuming initial quantity is 0
-                product_image='',  # Empty string for product image, you may adjust this based on your requirements
-                price=product_item_price,  # Set price to product_item_price
-            )
-            db.session.add(new_product_item)
-            db.session.commit()
-
-            # Create ProductTypeSelection entries for each product type option
-            new_product_type_selection = Product_Type_Selections(product_type_id=product_type_id, option=option)
-            db.session.add(new_product_type_selection)
-            db.session.commit()
-
-            # Associate Product_Type_Selection with Product_Item through Product_Options
-            new_product_option = Product_Options(product_type_selection_id=new_product_type_selection.id, product_item_id=new_product_item.id)
-            db.session.add(new_product_option)
-            db.session.commit()
-
-    return jsonify({"message": "Product created successfully"}), 200
-    
+        return jsonify({"error": "No product found"}), 400    
 
 @products_bp.route('/create_new_product/', methods=["POST", "OPTIONS"])
 @cross_origin()
@@ -119,8 +69,6 @@ def create_new_product():
     return jsonify({"message": "created product successffully", "product_id": new_product_id})
 
     
-
-
 
 @products_bp.route('/update_product/<int:id>/', methods=["PATCH", "OPTIONS"])
 @cross_origin()
@@ -154,19 +102,16 @@ def update_product(id):
 @products_bp.route('/delete_product/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
 def delete_product(id): 
+    # Find the product to delete
     product = Products.query.get(id)
-
     if product is None:
         return jsonify({"error": "Product not found"}), 400
-    
-    related_records = db.session.query(Product_Type_Selections).filter_by(product_id=id).all()
-    for record in related_records:
-        db.session.delete(record)
-    
+
+    # Delete the product
     db.session.delete(product)
     db.session.commit()
 
-    return jsonify({"message": "Product deleted successfully"}), 200
+    return jsonify({"message": "Product and related items deleted successfully"}), 200
 
 
 
