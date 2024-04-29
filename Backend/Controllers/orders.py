@@ -12,10 +12,10 @@ orders_bp = Blueprint("/orders/", __name__)
 
 # shopping cart item
 
-@orders_bp.route('/view_cart/<int:id>/', methods=["GET"])
+@orders_bp.route('/view_cart/<int:id>/', methods=["GET", "OPTIONS"])
 @cross_origin()
 def view_cart(id):
-    cart_items = Shopping_Cart_Item.query.filter_by(user_id=id, bought=False).all()
+    cart_items = Shopping_Cart_Item.query.filter_by(userId=id, bought=False).all()
 
     if cart_items:
         json_cart_items = [item.to_json() for item in cart_items]
@@ -33,20 +33,24 @@ def add_to_cart():
 
     user_id = data['userId']
     product_id = data['productId']
-    quantity = data['quantity']
+    quantity = int(data['quantity'])
 
     # Check if the item already exists in the shopping cart
     existing_item = Shopping_Cart_Item.query.filter_by(userId=user_id, product_id=product_id, bought=False).first()
 
     if existing_item:
-        quantity += 1
+        existing_item.quantity += quantity
+        
+        db.session.commit()
+
+        return jsonify({"updatedItem": existing_item.to_json()})
 
     # Add the item to the shopping cart
     new_cart_item = Shopping_Cart_Item(userId=user_id, product_id=product_id, quantity=quantity)
     db.session.add(new_cart_item)
     db.session.commit()
 
-    return jsonify({"message": "Item added to the shopping cart successfully"}), 201
+    return jsonify({"message": "Item added to the shopping cart successfully", "newItem": new_cart_item.to_json() }), 201
 
 
 @orders_bp.route('/remove_from_cart/<int:item_id>/', methods=["DELETE"])

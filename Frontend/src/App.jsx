@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Homepage from "./pages/Homepage";
@@ -8,12 +8,32 @@ import UserContext from "./context/User.jsx";
 import Sellers from "./pages/Sellers.jsx";
 import Category from "./pages/Category.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
+import useFetch from "./hooks/useFetch.js";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
   const [role, setRole] = useState("");
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState(0);
+  const [shoppingCart, setShoppingCart] = useState([]);
+
+  const fetchData = useFetch();
+
+  const getShoppingCartItems = async () => {
+    const res = await fetchData(
+      `/view_cart/${userId}/`,
+      "GET",
+      undefined,
+      undefined
+    );
+    if (res.ok) {
+      setShoppingCart(res.data.shopping_cart);
+    }
+  };
+
+  useEffect(() => {
+    getShoppingCartItems();
+  }, [userId]);
 
   return (
     <>
@@ -27,6 +47,8 @@ function App() {
           setUserId,
           role,
           setRole,
+          shoppingCart,
+          setShoppingCart,
         }}
       >
         <NavBar></NavBar>

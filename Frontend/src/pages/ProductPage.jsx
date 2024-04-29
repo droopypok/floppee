@@ -56,7 +56,30 @@ const ProductPage = () => {
     );
     if (res.ok) {
       console.log("Carted! hehe");
+      console.log(res.data);
+
+      if (res.data.updatedItem) {
+        const updatedCart = res.data.updatedItem;
+        const updatedCartQuantity = userCtx.shoppingCart.map((item) => {
+          if (item.id === updatedCart.id) {
+            return { ...item, quantity: updatedCart.quantity };
+          }
+          return item;
+        });
+        userCtx.setShoppingCart(updatedCartQuantity);
+        console.log(userCtx.shoppingCart);
+      } else {
+        const newItem = res.data.newItem;
+        const tempArr = [...userCtx.shoppingCart, newItem];
+        userCtx.setShoppingCart(tempArr);
+      }
+      console.log(userCtx.shoppingCart);
     }
+  };
+
+  const test = () => {
+    console.log("fuck");
+    console.log(userCtx.shoppingCart);
   };
 
   const getPriceRange = (products) => {
@@ -76,6 +99,7 @@ const ProductPage = () => {
   useEffect(() => {
     getProductById();
     getProductItem();
+    test();
   }, []);
 
   const handleSelectProductItem = (id, price, quantity) => {

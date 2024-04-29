@@ -46,12 +46,25 @@ const NavBar = () => {
                 </Link>
               </Button>
             ) : (
-              <Button color="inherit" startIcon={<ShoppingCartIcon />}>
-                Cart
-              </Button>
-              //   <ShoppingCartIcon>
-              //     <IconButton></IconButton>
-              //   </ShoppingCartIcon>
+              <>
+                <Button color="inherit" startIcon={<ShoppingCartIcon />}>
+                  {userCtx.shoppingCart && (
+                    <div
+                      className="rounded-circle bg-danger d-flex justify-content-center align-items-center"
+                      style={{
+                        color: "white",
+                        width: "1.2rem",
+                        height: "1.2rem",
+                        position: "absolute",
+                        bottom: 0,
+                        right: 0,
+                      }}
+                    >
+                      {userCtx.shoppingCart.length}
+                    </div>
+                  )}
+                </Button>
+              </>
             )}
           </Toolbar>
         </AppBar>
