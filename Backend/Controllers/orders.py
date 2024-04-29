@@ -1,4 +1,4 @@
-from ..Models.usersModels import Shopping_Cart, Shopping_Cart_Item, Orders, Shipping_Orders, Product_Reviews, Users, Addresses, Product_Item
+from ..Models.usersModels import Shopping_Cart, Shopping_Cart_Item, Orders, Shipping_Orders, Product_Reviews, Users, Addresses, Product_Item, Products
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
@@ -15,10 +15,27 @@ orders_bp = Blueprint("/orders/", __name__)
 @orders_bp.route('/view_cart/<int:id>/', methods=["GET", "OPTIONS"])
 @cross_origin()
 def view_cart(id):
-    cart_items = Shopping_Cart_Item.query.filter_by(userId=id, bought=False).all()
+    cart_items = db.session.query(Shopping_Cart_Item, Product_Item, Products, Users)\
+    .join(Product_Item, Shopping_Cart_Item.product_id == Product_Item.id)\
+    .join(Products, Product_Item.product_id == Products.id)\
+    .join(Users, Products.seller_id == Users.id)\
+    .filter(Shopping_Cart_Item.userId == id, Shopping_Cart_Item.bought == False)\
+    .all()
 
     if cart_items:
-        json_cart_items = [item.to_json() for item in cart_items]
+        json_cart_items = []
+        for cart_item, product_item, product, user in cart_items:
+      
+            json_cart_item = {
+                "id": cart_item.id,
+                "productId": product.id,
+                "productName": product.product_name,
+                "quantity": cart_item.quantity,
+                "sellerName": user.username,
+                "price": product_item.price 
+            }
+            json_cart_items.append(json_cart_item)
+
         return jsonify({"shopping_cart": json_cart_items}), 200
     else:
         return jsonify({"message": "Shopping cart is empty"}), 200
