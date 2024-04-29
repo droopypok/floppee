@@ -5,7 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link as RRLink, useNavigate } from "react-router-dom";
-import { Link } from "@mui/material";
+import { Badge, Link } from "@mui/material";
 import UserContext from "../context/User";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
@@ -47,12 +47,20 @@ const NavBar = () => {
               </Button>
             ) : (
               <>
-                <Button
-                  onClick={() => navigate("/cart")}
-                  color="inherit"
-                  startIcon={<ShoppingCartIcon />}
+                <Badge
+                  badgeContent={userCtx.shoppingCart.length}
+                  color="warning"
                 >
-                  {userCtx.shoppingCart && (
+                  <ShoppingCartIcon
+                    style={{ cursor: "pointer", fontSize: "40" }}
+                    onClick={() => navigate("/cart")}
+                  ></ShoppingCartIcon>
+                  {/* <Button
+                    onClick={() => navigate("/cart")}
+                    color="inherit"
+                    startIcon={<ShoppingCartIcon />}
+                  > */}
+                  {/* {userCtx.shoppingCart && (
                     <div
                       className="rounded-circle bg-danger d-flex justify-content-center align-items-center"
                       style={{
@@ -66,8 +74,9 @@ const NavBar = () => {
                     >
                       {userCtx.shoppingCart.length}
                     </div>
-                  )}
-                </Button>
+                  )} */}
+                  {/* </Button> */}
+                </Badge>
               </>
             )}
           </Toolbar>

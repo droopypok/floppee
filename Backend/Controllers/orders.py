@@ -1,4 +1,4 @@
-from ..Models.usersModels import Shopping_Cart, Shopping_Cart_Item, Orders, Shipping_Orders, Product_Reviews, Users, Addresses, Product_Item, Products
+from ..Models.usersModels import Shopping_Cart, Shopping_Cart_Item, Orders, Shipping_Orders, Product_Reviews, Users, Addresses, Product_Item, Products, Product_Options, Product_Type_Selections
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
@@ -16,26 +16,36 @@ orders_bp = Blueprint("/orders/", __name__)
 @cross_origin()
 def view_cart(id):
     cart_items = db.session.query(Shopping_Cart_Item, Product_Item, Products, Users)\
-    .join(Product_Item, Shopping_Cart_Item.product_id == Product_Item.id)\
-    .join(Products, Product_Item.product_id == Products.id)\
-    .join(Users, Products.seller_id == Users.id)\
-    .filter(Shopping_Cart_Item.userId == id, Shopping_Cart_Item.bought == False)\
-    .all()
+        .join(Product_Item, Shopping_Cart_Item.product_id == Product_Item.id)\
+        .join(Products, Product_Item.product_id == Products.id)\
+        .join(Users, Products.seller_id == Users.id)\
+        .filter(Shopping_Cart_Item.userId == id, Shopping_Cart_Item.bought == False)\
+        .all()
 
     print(cart_items)
 
     if cart_items:
         json_cart_items = []
+
         for cart_item, product_item, product, seller in cart_items:
-      
+            # Fetch options for the current product item
+            options = db.session.query(Product_Type_Selections)\
+                .join(Product_Options, Product_Type_Selections.id == Product_Options.product_type_selection_id)\
+                .filter(Product_Options.product_item_id == product_item.id)\
+                .all()
+
+            # Create JSON object for cart item
             json_cart_item = {
                 "id": cart_item.id,
                 "productId": product.id,
+                "productItemId": product_item.id,
                 "productName": product.product_name,
                 "quantity": cart_item.quantity,
                 "sellerName": seller.username,
-                "price": product_item.price 
+                "price": product_item.price,
+                "options": [option.option for option in options]  # Include options for the current product item
             }
+
             json_cart_items.append(json_cart_item)
 
         return jsonify({"shopping_cart": json_cart_items}), 200
@@ -52,17 +62,24 @@ def add_to_cart():
 
     user_id = data['userId']
     product_id = data['productId']
-    quantity = int(data['quantity'])
+    quantity = int(data.get('quantity', 0)) 
+    adjustQuantity = int(data.get('adjustQuantity', 0)) 
+
 
     # Check if the item already exists in the shopping cart
     existing_item = Shopping_Cart_Item.query.filter_by(userId=user_id, product_id=product_id, bought=False).first()
 
     if existing_item:
-        existing_item.quantity += quantity
-        
-        db.session.commit()
-
-        return jsonify({"updatedItem": existing_item.to_json()})
+        if quantity:
+            existing_item.quantity += quantity
+            db.session.commit()
+            return jsonify({"updatedItem": existing_item.to_json()})
+        elif adjustQuantity:
+            existing_item.quantity = adjustQuantity
+            db.session.commit()
+            return jsonify({"updatedItem": existing_item.to_json()})
+        else:
+            return jsonify({"message": "No quantity or adjustQuantity provided"}), 400
 
     # Add the item to the shopping cart
     new_cart_item = Shopping_Cart_Item(userId=user_id, product_id=product_id, quantity=quantity)
@@ -72,10 +89,10 @@ def add_to_cart():
     return jsonify({"message": "Item added to the shopping cart successfully", "newItem": new_cart_item.to_json() }), 201
 
 
-@orders_bp.route('/remove_from_cart/<int:item_id>/', methods=["DELETE"])
+@orders_bp.route('/remove_from_cart/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
-def remove_from_cart(item_id):
-    cart_item = Shopping_Cart_Item.query.get(item_id)
+def remove_from_cart(id):
+    cart_item = Shopping_Cart_Item.query.get(id)
 
     if cart_item:
         db.session.delete(cart_item)
