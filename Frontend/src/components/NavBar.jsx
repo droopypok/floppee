@@ -47,7 +47,11 @@ const NavBar = () => {
               </Button>
             ) : (
               <>
-                <Button color="inherit" startIcon={<ShoppingCartIcon />}>
+                <Button
+                  onClick={() => navigate("/cart")}
+                  color="inherit"
+                  startIcon={<ShoppingCartIcon />}
+                >
                   {userCtx.shoppingCart && (
                     <div
                       className="rounded-circle bg-danger d-flex justify-content-center align-items-center"
