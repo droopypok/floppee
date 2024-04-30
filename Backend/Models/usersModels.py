@@ -209,12 +209,19 @@ class Orders (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     buyer_id = db.Column(db.Integer, ForeignKey('users.id'))
     product_item_id = db.Column(db.Integer, ForeignKey('product_item.id'))
-    shopping_cart_id = db.Column(db.Integer, ForeignKey('shopping_cart.id'))
+    shopping_cart_id = db.Column(db.Integer, ForeignKey('shopping_cart_item.id'))
     shipping_address = db.Column(db.Integer, ForeignKey('addresses.id'))
-    status = db.Column(db.String(20), nullable=False, default='pending')
+    delivery_status = db.Column(db.Integer, ForeignKey('delivery_status.id'), default=1)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "buyerId": self.buyer_id,
+            "productItemId": self.product_item_id,
+            "shippingAddress": self.shipping_address,
+            "deliveryStatus": self.delivery_status 
+        }
     
-
-
 class Shipping_Orders (db.Model):
     __tablename__ = 'shipping_orders'
 

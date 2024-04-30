@@ -17,7 +17,10 @@ const useFetch = () => {
       } else {
         return (returnValue = { ok: true, data });
       }
+    } else {
+      returnValue = { ok: false, error: data.message || "Unknown error" };
     }
+
     return returnValue;
   };
   return fetchData;

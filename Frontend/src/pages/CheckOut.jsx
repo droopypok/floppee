@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/User";
 import {
@@ -19,12 +21,43 @@ const CheckOut = () => {
 
   const [groupedItems, setGroupedItems] = useState([]);
 
+  const getShoppingCartItems = async () => {
+    const res = await fetchData(
+      `/view_cart/${userCtx.userId}/`,
+      "GET",
+      undefined,
+      undefined
+    );
+    if (res.ok) {
+      console.log(res.data);
+      userCtx.setShoppingCart(res.data.shopping_cart);
+    }
+  };
+
+  const placeOrder = async () => {
+    const res = await fetchData(
+      "/create_order/",
+      "PUT",
+      {
+        buyerId: userCtx.userId,
+        orders: selectedItem,
+      },
+      undefined
+    );
+    if (res.ok) {
+      getShoppingCartItems();
+    } else {
+      toast.error(res.error);
+    }
+  };
+
   useEffect(() => {
     groupItems();
   }, []);
 
   useEffect(() => {
     console.log(groupedItems);
+    console.log(selectedItem);
   }, [groupedItems]);
 
   const groupItems = () => {
@@ -108,11 +141,12 @@ const CheckOut = () => {
           <Typography item variant="h3">
             Total Cost: ${calculateTotalPrice()}{" "}
           </Typography>
-          <Button item sx={{ fontSize: 20 }}>
+          <Button item sx={{ fontSize: 20 }} onClick={() => placeOrder()}>
             Place Order
           </Button>
         </BottomNavigation>
       </Paper>
+      <ToastContainer />
     </Container>
   );
 };

@@ -124,7 +124,57 @@ def checkout():
     return jsonify({"message": "Checkout successful"}), 200
 
 ## orders
+@orders_bp.route('/create_order/', methods=["PUT", "OPTIONS"])
+@cross_origin()
+def create_order():
+    data = request.json
+    buyer_id = data["buyerId"]
 
+    created_orders = []
+
+    for order_data in data["orders"]:
+        product_item_id = order_data.get('productItemId')
+        shopping_cart_id = order_data.get('id')
+        options = order_data.get('options')
+        productName = order_data.get('productName')
+
+        shopping_cart_item = Shopping_Cart_Item.query.get(shopping_cart_id)
+        if not shopping_cart_item:
+            return jsonify({"status": "error", "message": "Quantity not found?"}), 404
+
+        ordered_quantity = shopping_cart_item.quantity
+
+        existing_order = Orders.query.filter_by(shopping_cart_id=shopping_cart_id).first()
+        if existing_order:
+            return jsonify({"status": "error", "message":  "product already exists!"}), 400
+        
+        shopping_cart_item.bought = True
+
+
+        product_item = Product_Item.query.get(product_item_id)
+        if product_item:
+            if product_item.quantity >= ordered_quantity:
+                product_item.quantity -= ordered_quantity
+            else:
+                return jsonify({"status": "error", "message":  f"{productName} {options}\
+                                 Ordered quantity exceeds available quantity of {product_item.quantity}!"}), 400
+
+
+        new_order = Orders(
+            buyer_id=buyer_id,
+            product_item_id=product_item_id,
+            shopping_cart_id=shopping_cart_id,
+        )
+
+        db.session.add(new_order)
+        created_orders.append(new_order)          
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Orders created successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": "Error creating orders", "error": str(e)}), 500
 
 ## shipping orders
 
