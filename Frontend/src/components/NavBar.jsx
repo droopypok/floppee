@@ -5,13 +5,43 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link as RRLink, useNavigate } from "react-router-dom";
-import { Badge, Grid, Link } from "@mui/material";
+import {
+  Avatar,
+  Badge,
+  Grid,
+  IconButton,
+  Link,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import UserContext from "../context/User";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 
 const NavBar = () => {
   const userCtx = useContext(UserContext);
   const navigate = useNavigate();
+
+  const pages = ["Products", "Pricing", "Blog"];
+  const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
   return (
     <>
@@ -82,6 +112,37 @@ const NavBar = () => {
                 </>
               )}
             </Grid>
+            <Box sx={{ flexGrow: 0 }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar>
+                  <InsertEmoticonIcon
+                    sx={{ fontSize: 70, color: "orangered" }}
+                  />
+                </Avatar>
+              </IconButton>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
           </Toolbar>
         </AppBar>
       </Box>

@@ -8,6 +8,7 @@ import {
   CardMedia,
   Container,
   Grid,
+  Link,
   Typography,
 } from "@mui/material";
 
@@ -43,22 +44,27 @@ const Category = () => {
           {categoryProducts.length > 0 &&
             categoryProducts.map((item) => {
               return (
-                <Grid item sm={4} align={"center"}>
+                <Grid item sm={4}>
                   <Card>
                     <CardActionArea
                       onClick={() => navigate(`/product/${item.id}`)}
                     >
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image="https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034"
+                      ></CardMedia>
                       <CardContent>
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          image="https://preview.redd.it/qm3ksi2yajq41.png?auto=webp&s=6a4d6139b3edee3751d99cce315a7b568dbd595e"
-                        ></CardMedia>
-                        <Typography>{item.productName}</Typography>
-                        <Typography>{item.description}</Typography>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {item.productName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.description}
+                        </Typography>
                         <Typography>{item.productPrice}</Typography>
-                        <Typography>{item.sellerName}</Typography>
-                        <Typography>{item.id}</Typography>
+                        <Link underline="none" color={"orangered"}>
+                          {item.sellerName}
+                        </Link>
                       </CardContent>
                     </CardActionArea>
                   </Card>

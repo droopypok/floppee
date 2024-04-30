@@ -3,6 +3,7 @@ import useFetch from "../hooks/useFetch";
 import { useParams } from "react-router-dom";
 import { Box, Button, Container, Grid, Input, Typography } from "@mui/material";
 import UserContext from "../context/User";
+import formatCost from "../components/CostFormatter";
 
 const ProductPage = () => {
   const fetchData = useFetch();
@@ -17,6 +18,8 @@ const ProductPage = () => {
 
   const [productPrice, setProducePrice] = useState(0);
   const [productQuantity, setProductQuantity] = useState(0);
+
+  const [selectProductItem, setSelectProductItem] = useState("");
 
   const getProductById = async () => {
     console.log(productId);
@@ -82,7 +85,7 @@ const ProductPage = () => {
     const lowestPrice = pricedProducts[0].price;
     const highestPrice = pricedProducts[pricedProducts.length - 1].price;
 
-    return `${lowestPrice} - ${highestPrice}`;
+    return `$${formatCost(lowestPrice)} - $${formatCost(highestPrice)}`;
   };
 
   useEffect(() => {
@@ -104,45 +107,99 @@ const ProductPage = () => {
 
   return (
     <>
-      <Container>
-        <Grid container>
-          <Grid item>
-            <Grid>
-              <Box>
-                <Typography variant="h2">{product.productName}</Typography>
-              </Box>
-            </Grid>
-            <Typography variant="h2">
-              {cartedItems ? productPrice : getPriceRange(productItems)}
+      <Grid>
+        <Grid container marginTop={10}>
+          <Grid xs={12} marginBottom={10}>
+            <Typography align="center" variant="h1">
+              {product.productName}
             </Typography>
-            <Grid>
-              <Typography variant="h5">
-                Product description: {product.description}
+          </Grid>
+
+          <Grid
+            xs={12}
+            marginBottom={10}
+            paddingLeft={15}
+            paddingRight={15}
+            paddingTop={5}
+            paddingBottom={5}
+            boxShadow={1}
+            textAlign={"justify"}
+            bgcolor={"white"}
+          >
+            <Typography align="center" variant="h3" color="text.secondary">
+              {product.description}
+            </Typography>
+          </Grid>
+
+          <Grid xs={12} align="center" marginBottom={5}>
+            <Typography variant="h3">
+              {cartedItems
+                ? formatCost(productPrice)
+                : getPriceRange(productItems)}
+            </Typography>
+          </Grid>
+
+          {selectProductItem && (
+            <Grid
+              xs={12}
+              align="center"
+              marginBottom={3}
+              sx={{ width: "auto" }}
+              paddingTop={5}
+              paddingBottom={5}
+            >
+              <Typography variant="h4" marginBottom={2}>
+                {selectProductItem.join(" ")}
+              </Typography>
+              <Typography variant="h5" color={"GrayText"}>
+                {productQuantity ? `${productQuantity} units left` : ""}
               </Typography>
             </Grid>
-            <Typography>Seller name: {product.sellerName}</Typography>
+          )}
+
+          <Grid xs={12} align="center">
             {productItems &&
               productItems.map((item) => {
                 if (item.options.length > 0)
                   return (
                     <>
                       <Button
+                        xs={2}
+                        sx={{ fontSize: 20, color: "orangered" }}
                         onClick={() => {
                           handleSelectProductItem(
                             item.id,
                             item.price,
                             item.quantity
                           );
+                          setSelectProductItem(item.options);
                         }}
                       >
-                        {item.options}
+                        {item.options.length > 1
+                          ? item.options.join(" ")
+                          : item.options}
                       </Button>
                     </>
                   );
               })}
+          </Grid>
+          <Typography>{product.sellerName}</Typography>
 
+          <Grid
+            xs={12}
+            align="center"
+            paddingBottom={10}
+            display={"flex"}
+            justifyContent={"center"}
+          >
             <input
-              style={{ borderColor: "transparent" }}
+              style={{
+                borderColor: "transparent",
+                marginTop: "20px",
+                fontSize: "30px",
+                textAlign: "center",
+                width: "200px",
+              }}
               value={quantity}
               min={0}
               placeholder="quantity"
@@ -151,14 +208,15 @@ const ProductPage = () => {
               }}
               type="number"
             />
-
-            <Button onClick={addToCart}>Add to Cart</Button>
-            <Typography>
-              {productQuantity ? `${productQuantity} units left` : ""}
-            </Typography>
+            <Button
+              sx={{ fontSize: 20, marginLeft: 15, height: 1 }}
+              onClick={addToCart}
+            >
+              Add to Cart
+            </Button>
           </Grid>
         </Grid>
-      </Container>
+      </Grid>
     </>
   );
 };
