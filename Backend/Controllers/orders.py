@@ -105,6 +105,7 @@ def remove_from_cart(id):
 @orders_bp.route('/checkout/', methods=["POST"])
 @cross_origin()
 def checkout():
+
     data = request.json
     checkout = data.get('checkout')
 

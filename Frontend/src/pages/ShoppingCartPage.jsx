@@ -50,9 +50,8 @@ const ShoppingCartPage = () => {
     let total = 0;
     groupedItems.forEach((product) => {
       product.items.forEach((item) => {
-        if (selectedItem.includes(item.id)) {
+        if (selectedItem.some((selected) => selected.id === item.id)) {
           total += item.price * item.quantity;
-        } else {
         }
       });
     });
@@ -61,10 +60,20 @@ const ShoppingCartPage = () => {
 
   const toggleSelected = (itemId) => {
     setSelectedItem((prevSelectedItems) => {
-      if (prevSelectedItems.includes(itemId)) {
-        return prevSelectedItems.filter((id) => id !== itemId);
+      const selectedItem = groupedItems
+        .flatMap((group) => group.items)
+        .find((item) => item.id === itemId);
+
+      if (!selectedItem) {
+        return prevSelectedItems;
+      }
+
+      const isSelected = prevSelectedItems.some((item) => item.id === itemId);
+
+      if (isSelected) {
+        return prevSelectedItems.filter((item) => item.id !== itemId);
       } else {
-        return [...prevSelectedItems, itemId];
+        return [...prevSelectedItems, selectedItem];
       }
     });
   };
@@ -124,6 +133,7 @@ const ShoppingCartPage = () => {
 
   useEffect(() => {
     calculateTotalPrice();
+    console.log(selectedItem);
   }, [selectedItem, groupedItems]);
 
   return (
@@ -156,7 +166,9 @@ const ShoppingCartPage = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={selectedItem.includes(item.id)}
+                      checked={selectedItem.some(
+                        (selectedItem) => selectedItem.id === item.id
+                      )}
                       onChange={(e) => {
                         toggleSelected(item.id);
                       }}
@@ -174,7 +186,11 @@ const ShoppingCartPage = () => {
       ))}
       <p>Total Payable: {totalPrice}</p>
       {totalPrice !== 0 && (
-        <Button onClick={() => navigate("/checkout")}>Check out</Button>
+        <Button
+          onClick={() => navigate("/checkout", { state: { selectedItem } })}
+        >
+          Check out
+        </Button>
       )}
     </Container>
   );
