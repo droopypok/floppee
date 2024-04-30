@@ -9,12 +9,16 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const ShoppingCartPage = () => {
   const userCtx = useContext(UserContext);
   const fetchData = useFetch();
+  const navigate = useNavigate();
 
   const [groupedItems, setGroupedItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   // reduce to find all the same id and push them to same array
   const groupItems = () => {
@@ -26,8 +30,6 @@ const ShoppingCartPage = () => {
       // If productId is the same, sort by productItemId
       return a.productItemId - b.productItemId;
     });
-
-    console.log(sortedShoppingCart);
 
     const grouped = sortedShoppingCart.reduce((acc, item) => {
       const existingGroupIndex = acc.findIndex(
@@ -48,40 +50,24 @@ const ShoppingCartPage = () => {
     let total = 0;
     groupedItems.forEach((product) => {
       product.items.forEach((item) => {
-        if (item.selected) {
+        if (selectedItem.includes(item.id)) {
           total += item.price * item.quantity;
+        } else {
         }
       });
     });
-    return total;
+    setTotalPrice(total);
   };
 
-  const toggleSelected = (productId, itemId) => {
-    setGroupedItems((prevGroupedItems) => {
-      const updatedGroupedItems = prevGroupedItems.map((product) => {
-        if (product.productId === productId) {
-          return {
-            ...product,
-            items: product.items.map((item) => {
-              if (item.id === itemId) {
-                return { ...item, selected: !item.selected };
-              }
-              return item;
-            }),
-          };
-        }
-        return product;
-      });
-      return updatedGroupedItems;
+  const toggleSelected = (itemId) => {
+    setSelectedItem((prevSelectedItems) => {
+      if (prevSelectedItems.includes(itemId)) {
+        return prevSelectedItems.filter((id) => id !== itemId);
+      } else {
+        return [...prevSelectedItems, itemId];
+      }
     });
   };
-
-  useEffect(() => {
-    if (userCtx.userId) {
-      groupItems();
-    }
-    console.log(groupedItems);
-  }, [userCtx.shoppingCart]);
 
   const addToCart = async (productId, quantity) => {
     const res = await fetchData(
@@ -95,8 +81,7 @@ const ShoppingCartPage = () => {
       undefined
     );
     if (res.ok) {
-      console.log(res.data);
-      getShoppingCartItems();
+      getShoppingCartItems(productId);
     }
   };
 
@@ -112,7 +97,7 @@ const ShoppingCartPage = () => {
     }
   };
 
-  const getShoppingCartItems = async () => {
+  const getShoppingCartItems = async (productId) => {
     const res = await fetchData(
       `/view_cart/${userCtx.userId}/`,
       "GET",
@@ -120,9 +105,26 @@ const ShoppingCartPage = () => {
       undefined
     );
     if (res.ok) {
-      userCtx.setShoppingCart(res.data.shopping_cart);
+      const updatedShoppingCart = res.data.shopping_cart.map((item) => {
+        if (item.productId === productId) {
+          return { ...item, quantity: item.quantity };
+        } else {
+          return item;
+        }
+      });
+      userCtx.setShoppingCart(updatedShoppingCart);
     }
   };
+
+  useEffect(() => {
+    if (userCtx.userId) {
+      groupItems();
+    }
+  }, [userCtx.shoppingCart]);
+
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [selectedItem, groupedItems]);
 
   return (
     <Container>
@@ -154,8 +156,9 @@ const ShoppingCartPage = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      onChange={() => {
-                        toggleSelected(item.productId, item.id);
+                      checked={selectedItem.includes(item.id)}
+                      onChange={(e) => {
+                        toggleSelected(item.id);
                       }}
                       name={`item-${item.id}`}
                       color="primary"
@@ -169,7 +172,10 @@ const ShoppingCartPage = () => {
           ))}
         </Grid>
       ))}
-      <p>Total Payable: {calculateTotalPrice()}</p>
+      <p>Total Payable: {totalPrice}</p>
+      {totalPrice !== 0 && (
+        <Button onClick={() => navigate("/checkout")}>Check out</Button>
+      )}
     </Container>
   );
 };

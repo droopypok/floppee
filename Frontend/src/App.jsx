@@ -10,6 +10,7 @@ import Category from "./pages/Category.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
 import useFetch from "./hooks/useFetch.js";
 import ShoppingCartPage from "./pages/ShoppingCartPage.jsx";
+import CheckOut from "./pages/CheckOut.jsx";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -62,6 +63,7 @@ function App() {
           <Route path="category/:category" element={<Category />} />
           <Route path="product/:id" element={<ProductPage />} />
           <Route path="cart" element={<ShoppingCartPage />} />
+          <Route path="checkout" element={<CheckOut />} />
         </Routes>
       </UserContext.Provider>
     </>
