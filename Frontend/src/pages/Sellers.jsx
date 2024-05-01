@@ -26,6 +26,8 @@ import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/User";
 import ProductUpdateModal from "../components/ProductUpdateModal";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Sellers = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -35,6 +37,7 @@ const Sellers = () => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCategory, setProductCategory] = useState("laptop");
+  const [created, setCreated] = useState(false);
 
   // For Create Product_Item
   const [productId, setProductId] = useState(0); // Main product Id
@@ -61,6 +64,7 @@ const Sellers = () => {
 
   const fetchData = useFetch();
   const userCtx = useContext(UserContext);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
 
@@ -84,14 +88,13 @@ const Sellers = () => {
         category: productCategory,
         id: userCtx.userId,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
+      toast.success(res.data.message);
       setProductId(res.data.product_id);
       getSellerProducts();
-      console.log("Created main product :)) ha ha ha ");
-      setProductName("");
-      setProductDescription("");
+      setCreated(true);
     }
     console.log(productId);
   };
@@ -102,7 +105,7 @@ const Sellers = () => {
       "/products_types/" + productCategory + "/",
       "GET",
       undefined,
-      undefined
+      userCtx.accessToken
     );
 
     if (res.ok) {
@@ -111,12 +114,15 @@ const Sellers = () => {
   };
 
   const getAllCategories = async () => {
-    const res = await fetchData("/categories/", "GET", undefined, undefined);
+    const res = await fetchData(
+      "/categories/",
+      "GET",
+      undefined,
+      userCtx.accessToken
+    );
     if (res.ok) {
-      console.log(res.data);
       setAvailableCategories(res.data.categories);
     }
-    console.log(availableCategories);
   };
 
   const getSellerProducts = async () => {
@@ -124,7 +130,7 @@ const Sellers = () => {
       "/products/" + userCtx.userId + "/",
       "POST",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       setSellerProducts(res.data.product);
@@ -136,17 +142,15 @@ const Sellers = () => {
       "/delete_product/" + id + "/",
       "DELETE",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
-      console.log("item deleted");
       getSellerProducts();
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // createNewProduct();
     createMainProduct();
   };
 
@@ -178,10 +182,10 @@ const Sellers = () => {
         productTypeId: productType,
         option: productOptions,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
-      console.log("Created new option :D ");
+      toast.success("Option added successfully");
       setProductOptions("");
       getAllProductOptions();
     }
@@ -192,12 +196,11 @@ const Sellers = () => {
       `/product_options/${productId}/`,
       "POST",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       setItemOptions(res.data.productOptions);
     }
-    console.log(itemOptions);
   };
 
   const handleSelectOptions = (e, id) => {
@@ -219,8 +222,6 @@ const Sellers = () => {
       );
       setSelectedOptions(tempArr);
     }
-
-    console.log(selectedOptions);
   };
 
   const handleAddItems = () => {
@@ -248,10 +249,10 @@ const Sellers = () => {
         productId: productId,
         productItems: productItem,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
-      console.log("Added product items alhamdulilah");
+      toast.success("Added product items :) ");
       setProductId(0);
       setProductItem([]);
     } else {
@@ -283,53 +284,58 @@ const Sellers = () => {
             <>
               <Grid container>
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    required
-                    label="Product Name"
-                    onChange={(e) => setProductName(e.target.value)}
-                  ></TextField>
-                  <TextField
-                    fullWidth
-                    required
-                    multiline
-                    label="Product Description"
-                    onChange={(e) => setProductDescription(e.target.value)}
-                  ></TextField>
+                  {!created && (
+                    <>
+                      <TextField
+                        fullWidth
+                        required
+                        label="Product Name"
+                        onChange={(e) => setProductName(e.target.value)}
+                      ></TextField>
 
-                  <InputLabel id="Category-select">
-                    Category
-                    <Select
-                      id="Category-select"
-                      label="Category"
-                      value={productCategory}
-                      onChange={(e) => {
-                        setProductCategory(e.target.value);
-                      }}
-                    >
-                      {availableCategories.length > 0 &&
-                        availableCategories.map((item) => {
-                          return (
-                            <MenuItem
-                              id={item.id}
-                              key={item.id}
-                              value={item.category}
-                            >
-                              {item.category}
-                            </MenuItem>
-                          );
-                        })}
-                    </Select>
-                  </InputLabel>
+                      <TextField
+                        fullWidth
+                        required
+                        multiline
+                        label="Product Description"
+                        onChange={(e) => setProductDescription(e.target.value)}
+                      ></TextField>
 
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Create new product
-                  </Button>
+                      <InputLabel id="Category-select">
+                        Category
+                        <Select
+                          id="Category-select"
+                          label="Category"
+                          value={productCategory}
+                          onChange={(e) => {
+                            setProductCategory(e.target.value);
+                          }}
+                        >
+                          {availableCategories.length > 0 &&
+                            availableCategories.map((item) => {
+                              return (
+                                <MenuItem
+                                  id={item.id}
+                                  key={item.id}
+                                  value={item.category}
+                                >
+                                  {item.category}
+                                </MenuItem>
+                              );
+                            })}
+                        </Select>
+                      </InputLabel>
+
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                      >
+                        Create new product
+                      </Button>
+                    </>
+                  )}
 
                   <InputLabel id="item-type-selector">
                     Item Types
@@ -357,6 +363,7 @@ const Sellers = () => {
                     </Select>
                   </InputLabel>
 
+                  {created && <></>}
                   <Box mt={2}>
                     <InputLabel htmlFor="custom-input">
                       Add Options for Item Types
@@ -374,7 +381,8 @@ const Sellers = () => {
                     </Button>
                   </Box>
 
-                  <br></br>
+                  <br />
+                  <br />
 
                   <Typography variant="h3">
                     Product Item #{productItem.length + 1}
@@ -459,9 +467,12 @@ const Sellers = () => {
                   </FormControl>
                 </Grid>
               </Grid>
-
-              <Button onClick={handleAddItems}>Add another item</Button>
-              <Button onClick={addProductItems}>Done</Button>
+              {created && (
+                <>
+                  <Button onClick={handleAddItems}>Add another item</Button>
+                  <Button onClick={addProductItems}>Done</Button>{" "}
+                </>
+              )}
             </>
           </Box>
         </Box>
@@ -478,13 +489,21 @@ const Sellers = () => {
                       <Card>
                         <CardContent>
                           <CardActionArea
-                            onClick={() => console.log("Clicked")}
+                            onClick={() => navigate(`/product/${item.id}`)}
                           >
                             <CardMedia component="img" height="140" />
-                            <h3>{item.productName}</h3>
-                            <h3>{item.description}</h3>
-                            <h3>{item.id}</h3>
-                            <h3>{item.category}</h3>
+                            <Typography variant="h5">
+                              {item.productName}
+                            </Typography>
+                            <Typography variant="h6">
+                              Item Id: {item.id}
+                            </Typography>
+                            <Typography variant="h6" marginBottom={1}>
+                              Category: {item.category}
+                            </Typography>
+                            <Typography variant="body1" sx={{}}>
+                              {item.description}
+                            </Typography>
                           </CardActionArea>
                         </CardContent>
                         <CardActions>
@@ -529,6 +548,7 @@ const Sellers = () => {
             getSellerProducts={getSellerProducts}
           ></ProductUpdateModal>
         </Grid>
+        <ToastContainer />
       </Container>
     </>
   );

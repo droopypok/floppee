@@ -138,7 +138,14 @@ const ShoppingCartPage = () => {
 
   return (
     <Container>
-      <Typography variant="h3">CART PAGE</Typography>
+      <Typography variant="h3" align="center" marginTop={10}>
+        CART PAGE
+      </Typography>
+      {userCtx.shoppingCart.length === 0 && (
+        <Typography marginTop={10} variant="h1" align="center">
+          pls buy smth
+        </Typography>
+      )}
       {groupedItems.map((product) => (
         <Grid container key={product.productId}>
           <Typography item variant="h4">
@@ -184,7 +191,11 @@ const ShoppingCartPage = () => {
           ))}
         </Grid>
       ))}
-      <p>Total Payable: {totalPrice}</p>
+      {userCtx.shoppingCart.length > 0 && (
+        <Typography variant="h5" align="right">
+          Total Payable: {totalPrice}
+        </Typography>
+      )}
       {totalPrice !== 0 && (
         <Button
           onClick={() => navigate("/checkout", { state: { selectedItem } })}

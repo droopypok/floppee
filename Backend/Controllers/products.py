@@ -54,8 +54,13 @@ def create_new_product():
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    print(user)
+
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+
 
 
     required_fields = ['description', 'name', 'category', 'id',]
@@ -86,9 +91,10 @@ def update_product(id):
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
-  
+    
     data = request.json
 
     product = Products.query.get(id)
@@ -122,8 +128,11 @@ def delete_product(id):
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+    
     # Find the product to delete
     product = Products.query.get(id)
     if product is None:
@@ -231,7 +240,9 @@ def create_product_item():
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
     
     data = request.json
@@ -266,7 +277,9 @@ def update_product_item(id):
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
     
     data = request.json
@@ -296,7 +309,8 @@ def delete_product_item(id):
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
 
     product_item = Product_Item.query.get(id)
@@ -349,7 +363,9 @@ def create_options_productId():
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
     
     data = request.json
@@ -386,7 +402,9 @@ def create_new_product_item():
 
     user = get_jwt_identity()
 
-    if user.role not in [1, 2]:
+    existingUser = Users.query.filter_by(username=user).first()
+
+    if existingUser.role not in [2, 3]: 
         return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
     
     data = request.json

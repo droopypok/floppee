@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Grid, TextField, InputLabel, Select, MenuItem } from "@mui/material";
 import useFetch from "../hooks/useFetch";
+import User from "../context/User";
 
 const style = {
   position: "absolute",
@@ -22,6 +23,7 @@ export default function ProductUpdateModal(props) {
   const productNameRef = useRef(props.selectedProduct.name);
   const productDescriptionRef = useRef(props.selectedProduct.description);
   const categoryRef = useRef(props.selectedProduct.category);
+  const userCtx = useContext(User);
 
   const fetchData = useFetch();
 
@@ -37,7 +39,7 @@ export default function ProductUpdateModal(props) {
       "/update_product/" + props.selectedProduct.id + "/",
       "PATCH",
       updatedProduct,
-      undefined
+      userCtx.accessToken
     );
 
     if (res.ok) {
