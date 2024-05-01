@@ -44,8 +44,18 @@ const Category = () => {
           {categoryProducts.length > 0 &&
             categoryProducts.map((item) => {
               return (
-                <Grid item sm={4}>
+                <Grid item sm={3}>
                   <Card>
+                    <Grid align="right" sx={{}}>
+                      <Link
+                        underline="none"
+                        color={"orangered"}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate("/")}
+                      >
+                        {item.sellerName}
+                      </Link>
+                    </Grid>
                     <CardActionArea
                       onClick={() => navigate(`/product/${item.id}`)}
                     >
@@ -62,9 +72,6 @@ const Category = () => {
                           {item.description}
                         </Typography>
                         <Typography>{item.productPrice}</Typography>
-                        <Link underline="none" color={"orangered"}>
-                          {item.sellerName}
-                        </Link>
                       </CardContent>
                     </CardActionArea>
                   </Card>

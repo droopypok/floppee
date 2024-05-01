@@ -11,6 +11,8 @@ import ProductPage from "./pages/ProductPage.jsx";
 import useFetch from "./hooks/useFetch.js";
 import ShoppingCartPage from "./pages/ShoppingCartPage.jsx";
 import CheckOut from "./pages/CheckOut.jsx";
+import Profile from "./pages/Profile.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -26,7 +28,7 @@ function App() {
       `/view_cart/${userId}/`,
       "GET",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       setShoppingCart(res.data.shopping_cart);
@@ -64,6 +66,7 @@ function App() {
           <Route path="product/:id" element={<ProductPage />} />
           <Route path="cart" element={<ShoppingCartPage />} />
           <Route path="checkout" element={<CheckOut />} />
+          <Route path="profile" element={<Profile />} />
         </Routes>
       </UserContext.Provider>
     </>

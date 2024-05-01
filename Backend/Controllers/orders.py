@@ -2,6 +2,7 @@ from ..Models.usersModels import Shopping_Cart, Shopping_Cart_Item, Orders, Ship
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
+from flask_jwt_extended import jwt_required
 
 
 orders_bp = Blueprint("/orders/", __name__)
@@ -14,6 +15,7 @@ orders_bp = Blueprint("/orders/", __name__)
 
 @orders_bp.route('/view_cart/<int:id>/', methods=["GET", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def view_cart(id):
     cart_items = db.session.query(Shopping_Cart_Item, Product_Item, Products, Users)\
         .join(Product_Item, Shopping_Cart_Item.product_id == Product_Item.id)\
@@ -56,6 +58,7 @@ def view_cart(id):
 
 @orders_bp.route('/add_to_cart/', methods=["POST", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def add_to_cart():
     data = request.json
     print(data)
@@ -73,13 +76,13 @@ def add_to_cart():
         if quantity:
             existing_item.quantity += quantity
             db.session.commit()
-            return jsonify({"updatedItem": existing_item.to_json()})
+            return jsonify({"message": "Updated quantity", "updatedItem": existing_item.to_json()})
         elif adjustQuantity:
             existing_item.quantity = adjustQuantity
             db.session.commit()
-            return jsonify({"updatedItem": existing_item.to_json()})
+            return jsonify({"message": "Updated quantity", "updatedItem": existing_item.to_json()})
         else:
-            return jsonify({"message": "No quantity or adjustQuantity provided"}), 400
+            return jsonify({"message": "No quantity provided"}), 400
 
     # Add the item to the shopping cart
     new_cart_item = Shopping_Cart_Item(userId=user_id, product_id=product_id, quantity=quantity)
@@ -91,6 +94,7 @@ def add_to_cart():
 
 @orders_bp.route('/remove_from_cart/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def remove_from_cart(id):
     cart_item = Shopping_Cart_Item.query.get(id)
 
@@ -104,6 +108,7 @@ def remove_from_cart(id):
 
 @orders_bp.route('/checkout/', methods=["POST"])
 @cross_origin()
+@jwt_required()
 def checkout():
 
     data = request.json
@@ -124,8 +129,14 @@ def checkout():
     return jsonify({"message": "Checkout successful"}), 200
 
 ## orders
+
+
+
+
+
 @orders_bp.route('/create_order/', methods=["PUT", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def create_order():
     data = request.json
     buyer_id = data["buyerId"]
@@ -175,6 +186,8 @@ def create_order():
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": "Error creating orders", "error": str(e)}), 500
+
+
 
 ## shipping orders
 

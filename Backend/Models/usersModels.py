@@ -218,6 +218,7 @@ class Orders (db.Model):
             "id": self.id,
             "buyerId": self.buyer_id,
             "productItemId": self.product_item_id,
+            "shoppingCartId": self.shopping_cart_id,
             "shippingAddress": self.shipping_address,
             "deliveryStatus": self.delivery_status 
         }

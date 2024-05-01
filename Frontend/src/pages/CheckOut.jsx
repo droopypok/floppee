@@ -11,10 +11,11 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CheckOut = () => {
   const fetchData = useFetch();
+  const navigate = useNavigate();
   const userCtx = useContext(UserContext);
   const location = useLocation();
   const { selectedItem } = location.state;
@@ -26,7 +27,7 @@ const CheckOut = () => {
       `/view_cart/${userCtx.userId}/`,
       "GET",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       console.log(res.data);
@@ -42,10 +43,12 @@ const CheckOut = () => {
         buyerId: userCtx.userId,
         orders: selectedItem,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
+      toast.success(res.message);
       getShoppingCartItems();
+      navigate("/");
     } else {
       toast.error(res.error);
     }

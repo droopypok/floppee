@@ -87,7 +87,7 @@ const ShoppingCartPage = () => {
         productId: productId,
         adjustQuantity: quantity,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       getShoppingCartItems(productId);
@@ -99,7 +99,7 @@ const ShoppingCartPage = () => {
       `/remove_from_cart/${id}/`,
       "DELETE",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       getShoppingCartItems();
@@ -111,7 +111,7 @@ const ShoppingCartPage = () => {
       `/view_cart/${userCtx.userId}/`,
       "GET",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       const updatedShoppingCart = res.data.shopping_cart.map((item) => {

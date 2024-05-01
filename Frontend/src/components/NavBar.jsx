@@ -99,50 +99,49 @@ const NavBar = () => {
               ) : (
                 <>
                   {userCtx.shoppingCart && (
-                    <Badge
-                      badgeContent={userCtx.shoppingCart.length}
-                      color="warning"
-                    >
-                      <ShoppingCartIcon
-                        style={{ cursor: "pointer", fontSize: "40" }}
-                        onClick={() => navigate("/cart")}
-                      ></ShoppingCartIcon>
-                    </Badge>
+                    <>
+                      <Badge
+                        badgeContent={userCtx.shoppingCart.length}
+                        color="warning"
+                      >
+                        <ShoppingCartIcon
+                          style={{ cursor: "pointer", fontSize: "40" }}
+                          onClick={() => navigate("/cart")}
+                        ></ShoppingCartIcon>
+                      </Badge>
+                      <Box sx={{ flexGrow: 0 }}>
+                        <IconButton
+                          onClick={() => navigate("/profile")}
+                          sx={{ p: 0, marginLeft: 5 }}
+                        >
+                          <Avatar>
+                            <InsertEmoticonIcon
+                              sx={{ fontSize: 70, color: "orangered" }}
+                            />
+                          </Avatar>
+                        </IconButton>
+                        <Menu
+                          sx={{ mt: "45px" }}
+                          id="menu-appbar"
+                          anchorEl={anchorElUser}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          keepMounted
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          open={Boolean(anchorElUser)}
+                          onClose={handleCloseUserMenu}
+                        ></Menu>
+                      </Box>
+                    </>
                   )}
                 </>
               )}
             </Grid>
-            <Box sx={{ flexGrow: 0 }}>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar>
-                  <InsertEmoticonIcon
-                    sx={{ fontSize: 70, color: "orangered" }}
-                  />
-                </Avatar>
-              </IconButton>
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
           </Toolbar>
         </AppBar>
       </Box>

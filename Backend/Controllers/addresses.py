@@ -1,6 +1,3 @@
-# import sys
-# sys.path.append("..")
-
 from flask import jsonify, Blueprint, request
 from ..Models.usersModels import Addresses, User_Address, Users
 from ..extensions import db

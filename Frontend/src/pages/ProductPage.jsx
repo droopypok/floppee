@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Container, Grid, Input, Typography } from "@mui/material";
 import UserContext from "../context/User";
 import formatCost from "../components/CostFormatter";
+import { ToastContainer, toast } from "react-toastify";
 
 const ProductPage = () => {
   const fetchData = useFetch();
   const productId = useParams();
   const userCtx = useContext(UserContext);
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState([]);
   const [productItems, setProductItems] = useState([]);
@@ -55,9 +57,10 @@ const ProductPage = () => {
         productId: cartedItems,
         quantity: quantity,
       },
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
+      toast.success(res.data.message);
       getShoppingCartItems();
     }
   };
@@ -67,7 +70,7 @@ const ProductPage = () => {
       `/view_cart/${userCtx.userId}/`,
       "GET",
       undefined,
-      undefined
+      userCtx.accessToken
     );
     if (res.ok) {
       userCtx.setShoppingCart(res.data.shopping_cart);
@@ -85,7 +88,7 @@ const ProductPage = () => {
     const lowestPrice = pricedProducts[0].price;
     const highestPrice = pricedProducts[pricedProducts.length - 1].price;
 
-    return `$${formatCost(lowestPrice)} - $${formatCost(highestPrice)}`;
+    return `${formatCost(lowestPrice)} - ${formatCost(highestPrice)}`;
   };
 
   useEffect(() => {
@@ -183,7 +186,6 @@ const ProductPage = () => {
                   );
               })}
           </Grid>
-          <Typography>{product.sellerName}</Typography>
 
           <Grid
             xs={12}
@@ -210,12 +212,15 @@ const ProductPage = () => {
             />
             <Button
               sx={{ fontSize: 20, marginLeft: 15, height: 1 }}
-              onClick={addToCart}
+              onClick={() => {
+                userCtx.username ? addToCart() : navigate("/login");
+              }}
             >
               Add to Cart
             </Button>
           </Grid>
         </Grid>
+        <ToastContainer />
       </Grid>
     </>
   );

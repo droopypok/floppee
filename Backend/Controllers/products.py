@@ -2,6 +2,7 @@ from ..Models.usersModels import Products, Product_Item, Product_Type_Selections
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from ..extensions import db
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 ## Products Table
 
@@ -44,10 +45,18 @@ def get_product(id):
     else:
         return jsonify({"error": "No product found"}), 400    
 
+
 @products_bp.route('/create_new_product/', methods=["POST", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def create_new_product():
     data = request.json
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+
 
     required_fields = ['description', 'name', 'category', 'id',]
     if not all(field in data for field in required_fields):
@@ -72,7 +81,14 @@ def create_new_product():
 
 @products_bp.route('/update_product/<int:id>/', methods=["PATCH", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def update_product(id):
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+  
     data = request.json
 
     product = Products.query.get(id)
@@ -101,7 +117,13 @@ def update_product(id):
 
 @products_bp.route('/delete_product/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def delete_product(id): 
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
     # Find the product to delete
     product = Products.query.get(id)
     if product is None:
@@ -204,7 +226,14 @@ def get_product_item(id):
 
 @products_bp.route('/product_items/', methods=["POST", "OPTIONS"])
 @cross_origin()
+@jwt_required
 def create_product_item():
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+    
     data = request.json
 
     required_fields = ['product_id', 'quantity', 'productImage', 'price']
@@ -232,7 +261,14 @@ def create_product_item():
 
 @products_bp.route('/product_items/<int:id>/', methods=["PATCH", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def update_product_item(id):
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+    
     data = request.json
 
     product_item = Product_Item.query.get(id)
@@ -255,7 +291,14 @@ def update_product_item(id):
 
 @products_bp.route('/product_items/<int:id>/', methods=["DELETE", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def delete_product_item(id):
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+
     product_item = Product_Item.query.get(id)
 
     if product_item is None:
@@ -301,7 +344,14 @@ def get_product_type_selections_by_product_type_id(id):
 
 @products_bp.route('/create_options/', methods=["PUT", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def create_options_productId():
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+    
     data = request.json
 
     required_fields = ['productId', 'productTypeId', 'option', ]
@@ -331,7 +381,14 @@ def get_all_product_options(id):
 
 @products_bp.route('/create_new_product_item/', methods=["PUT", "OPTIONS"])
 @cross_origin()
+@jwt_required()
 def create_new_product_item():
+
+    user = get_jwt_identity()
+
+    if user.role not in [1, 2]:
+        return jsonify({"error": "Unauthorized. Only sellers or admins can update products"}), 404
+    
     data = request.json
 
     required_fields = ['productId', 'productItems']
