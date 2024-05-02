@@ -161,30 +161,33 @@ const ProductPage = () => {
           )}
 
           <Grid xs={12} align="center">
-            {productItems &&
-              productItems.map((item) => {
-                if (item.options.length > 0)
-                  return (
-                    <>
-                      <Button
-                        xs={2}
-                        sx={{ fontSize: 20, color: "orangered" }}
-                        onClick={() => {
-                          handleSelectProductItem(
-                            item.id,
-                            item.price,
-                            item.quantity
-                          );
-                          setSelectProductItem(item.options);
-                        }}
-                      >
-                        {item.options.length > 1
-                          ? item.options.join(" ")
-                          : item.options}
-                      </Button>
-                    </>
-                  );
-              })}
+            <Typography variant="h6">
+              Variations:
+              {productItems &&
+                productItems.map((item) => {
+                  if (item.options.length > 0)
+                    return (
+                      <>
+                        <Button
+                          xs={2}
+                          sx={{ fontSize: 20, color: "orangered" }}
+                          onClick={() => {
+                            handleSelectProductItem(
+                              item.id,
+                              item.price,
+                              item.quantity
+                            );
+                            setSelectProductItem(item.options);
+                          }}
+                        >
+                          {item.options.length > 1
+                            ? item.options.join(" ")
+                            : item.options}
+                        </Button>
+                      </>
+                    );
+                })}
+            </Typography>
           </Grid>
 
           <Grid

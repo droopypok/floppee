@@ -1,14 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/User";
-import {
-  BottomNavigation,
-  Button,
-  Container,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Container, Grid, Typography } from "@mui/material";
+import formatCost from "../components/CostFormatter";
 
 const Profile = () => {
   const fetchData = useFetch();
@@ -19,11 +13,9 @@ const Profile = () => {
   const groupItems = () => {
     console.log(orderedItems);
     const sortedShoppingCart = [...orderedItems].sort((a, b) => {
-      // Sort by productId first
       if (a.productId !== b.productId) {
         return a.productId - b.productId;
       }
-      // If productId is the same, sort by productItemId
       return a.productItemId - b.productItemId;
     });
 
@@ -60,13 +52,11 @@ const Profile = () => {
 
   useEffect(() => {
     groupItems();
-    console.log(orderedItems);
-    console.log(groupedItems);
   }, [orderedItems]);
 
   return (
     <Container>
-      <Typography variant="h2">Orders</Typography>
+      <Typography variant="h3">Orders</Typography>
       {groupedItems &&
         groupedItems.map((product) => (
           <Grid container key={product.productId} marginTop={3}>
@@ -78,17 +68,21 @@ const Profile = () => {
               <Grid container direction={"row"} spacing={10}>
                 {product.items.map((item) => (
                   <Grid item>
-                    <Typography variant="h5">
+                    <Typography variant="body1">
                       Quantity: {item.quantity}
                     </Typography>
-                    <Typography variant="h5">
-                      Options: {`${item.options}`}{" "}
+                    <Typography variant="body1">
+                      Options: {item.options.join(" ")}
                     </Typography>
-                    <Typography variant="h5">
-                      Unit Price: {item.price}
+                    <Typography variant="body1">
+                      Price: {formatCost(item.price)}
                     </Typography>
-                    <Typography variant="h5">
-                      Total: {item.price * item.quantity}
+                    <Typography variant="body1">
+                      Total: {formatCost(item.price * item.quantity)}
+                    </Typography>
+                    <Typography variant="body1">
+                      Delivery Status:
+                      {item.deliveryStatus}
                     </Typography>
                   </Grid>
                 ))}

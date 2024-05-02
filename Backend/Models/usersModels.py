@@ -94,7 +94,7 @@ class Product_Item(db.Model):
     product_id = db.Column(db.Integer, ForeignKey('products.id'))
     quantity = db.Column(db.Integer, nullable=False)
     product_image = db.Column(db.Text, nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
 
     options = db.relationship("Product_Options", backref="item", cascade="all, delete-orphan")
     cart = db.relationship("Shopping_Cart_Item", backref="item", cascade="all, delete-orphan")
