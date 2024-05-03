@@ -49,3 +49,11 @@ DATABASE
 
 - Implemenet checkout feature (including delivery status update and seller product page) 
 - Implement image upload function for set category pictures and product pictures
+
+
+# References
+- https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/
+- https://flask.palletsprojects.com/en/3.0.x/
+- https://flask-migrate.readthedocs.io/en/latest/
+- https://flask-jwt-extended.readthedocs.io/en/stable/
+- https://www.youtube.com/watch?v=Z1RJmh_OqeA&t=1704s&ab_channel=freeCodeCamp.org
