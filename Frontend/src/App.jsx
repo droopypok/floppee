@@ -12,6 +12,7 @@ import useFetch from "./hooks/useFetch.js";
 import ShoppingCartPage from "./pages/ShoppingCartPage.jsx";
 import CheckOut from "./pages/CheckOut.jsx";
 import Profile from "./pages/Profile.jsx";
+import SellersShop from "./pages/SellersShop.jsx";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -66,6 +67,7 @@ function App() {
           <Route path="cart" element={<ShoppingCartPage />} />
           <Route path="checkout" element={<CheckOut />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="shop" element={<SellersShop />} />
         </Routes>
       </UserContext.Provider>
     </>

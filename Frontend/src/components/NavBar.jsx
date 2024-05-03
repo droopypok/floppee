@@ -87,6 +87,12 @@ const NavBar = () => {
                       sellers view
                     </RRLink>
                   </Button>
+                  {/* <Button
+                    style={{ color: "whitesmoke" }}
+                    onClick={() => navigate("/shop")}
+                  >
+                    Your shop
+                  </Button> */}
                 </Grid>
               )}
 

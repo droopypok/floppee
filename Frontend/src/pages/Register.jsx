@@ -14,6 +14,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 const Register = () => {
   const fetchData = useFetch();
@@ -22,6 +24,7 @@ const Register = () => {
   const [availableRoles, setAvailableRoles] = useState([]);
   const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const register = async () => {
     const res = await fetchData(
@@ -34,9 +37,11 @@ const Register = () => {
       res.data;
       console.log(res);
     }
+    toast.success("Account created successfully ;) ");
     setUsername("");
     setPassword("");
     setRole("");
+    navigate("/login");
   };
 
   const getRoles = async () => {
@@ -150,6 +155,7 @@ const Register = () => {
             </Box>
           </Box>
         </Container>
+        <ToastContainer />
       </ThemeProvider>
     </>
   );

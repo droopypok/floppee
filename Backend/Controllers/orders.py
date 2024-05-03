@@ -237,6 +237,54 @@ def get_all_orders(id):
     return jsonify({"orders": orders_list})
 
 
+@orders_bp.route('/get_all_pending_orders/<int:id>/', methods=["GET", "OPTIONS"])
+@cross_origin()
+def get_all_pending_orders(id):
+    
+    query = db.session.query(Orders, Product_Item, Products, Product_Options, Product_Type_Selections, Users, Shopping_Cart_Item, DeliveryStatus)\
+        .join(Product_Item, Orders.product_item_id == Product_Item.id)\
+        .join(Products, Product_Item.product_id == Products.id)\
+        .join(Product_Options, Product_Item.id == Product_Options.product_item_id)\
+        .join(Product_Type_Selections, Product_Options.product_type_selection_id == Product_Type_Selections.id)\
+        .join(Users, Users.id == Orders.buyer_id)\
+        .join(Shopping_Cart_Item, Orders.shopping_cart_id == Shopping_Cart_Item.id)\
+        .join(DeliveryStatus, DeliveryStatus.id == Orders.delivery_status)\
+        .filter(Products.seller_id == id, Orders.delivery_status == 1)\
+        .all()
+
+    orders_list = []
+    processed_order_ids = set()  # To keep track of processed order IDs
+
+    for order, product_item, product, product_option, product_type_selection, user, cart_item, status in query:
+        order_id = order.id
+        
+        # Check if the order ID has already been processed
+        if order_id in processed_order_ids:
+            continue  
+    
+        processed_order_ids.add(order_id)
+      
+        options_query = db.session.query(Product_Type_Selections)\
+            .join(Product_Options, Product_Type_Selections.id == Product_Options.product_type_selection_id)\
+            .filter(Product_Options.product_item_id == product_item.id)\
+            .all()
+        
+        order_data = {
+            "buyer_username": user.username,
+            "seller_username": product.seller_id,
+            "productId": product.id,
+            "productName": product.product_name,
+            "quantity": cart_item.quantity,
+            "price": product_item.price,
+            "deliveryStatus": status.status,
+            "options": [option.option for option in options_query]  # Include options for the current product item
+        }
+
+        orders_list.append(order_data)
+
+    return jsonify({"orders": orders_list})
+
+
 
 ## shipping orders
 
